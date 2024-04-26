@@ -15,8 +15,6 @@ from django.contrib.auth import authenticate,login as auth_login, login, logout
 from django.contrib import messages
 from .settings import PAYPAL_RECEIVER_EMAIL
 import json
-import stripe
-
 
 
 
