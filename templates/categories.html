@@ -1,0 +1,166 @@
+
+  {% load static %}
+
+  <!DOCTYPE html>
+  <html>
+  <head>
+      <title>SHOP NOW</title>
+      <style>
+          
+          body {
+              margin: 0;
+              font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Prettier font */
+          }
+          .header-bar {
+              background-color: #7e3535;
+              color: white;
+              padding: 10px 20px;
+              display: flex;
+              justify-content: space-between; /* Adjusted for alignment */
+              align-items: center;
+          }
+          .header-links {
+              /* Additional styling for the link container */
+          }
+          .header-links a {
+              background-color: white; /* White background for buttons */
+              color: #7e3535; /* Color to match the header */
+              padding: 10px 15px;
+              border-radius: 5px; /* Rounded corners */
+              margin-left: 10px; /* Space between buttons */
+          }
+          .shop-now-header {
+              text-align: center;
+              margin-top: 20px;
+          }
+          ul {
+              list-style-type: none;
+              padding: 0;
+              display: flex;
+              flex-wrap: wrap;
+              justify-content: center;
+          }
+          li {
+              padding: 8px;
+              margin: 10px;
+              background: #f7f7f7;
+              border: 1px solid #ddd;
+              border-radius: 15px; /* Rounded corners for widgets */
+              text-align: center;
+          }
+          li img {
+              width: 100px; 
+              height: 100px; 
+              margin-bottom: 8px;
+              border-radius: 15px; /* Rounded corners for images */
+          }
+          a {
+              text-decoration: none;
+              color: black;
+              display: block;
+          }
+          a:hover {
+              text-decoration: underline;
+          }
+          form {
+            text-align: center;
+            margin-top: 20px;
+        }
+        input[type="text"] {
+            padding: 10px;
+            margin-right: 5px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #7e3535;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #5d2727;
+        }
+      </style>
+  </head>
+  <body>
+    <header class="header-bar">
+        <h1>Dazzle Dash</h1>
+        <div class="header-links">
+            {% if not user_logged_in %}
+                <a href="{% url 'signup' %}">Signup</a> | <a href="{% url 'login' %}">Login</a>
+            {% elif not is_admin %}
+                <a href="{% url 'logout' %}">Logout</a> | <a href="{% url 'view_cart' %}">View Cart</a>
+            {% else %}
+                <a href="{% url 'logout' %}">Logout</a>
+            {% endif %}
+        </div>
+    </header>
+
+    <h2 class="shop-now-header">SHOP NOW</h2>
+    <ul>
+        {% for category in categories %}
+            <li>
+                <img src="{% static 'bracelet.jpg' %}" alt="Bracelet">
+                <a href="{% url 'category_products' category.0 %}">{{ category.1 }}</a>
+            </li>
+        {% endfor %}
+    </ul>
+    {% if is_admin %}
+        <form action="{% url 'add_category' %}" method="post">
+            {% csrf_token %}
+            <input type="text" name="category_name" required placeholder="Enter Category Name">
+            <button type="submit">Add Category</button>
+        </form>
+    {% endif %}
+</body>
+  <!-- <body>
+      
+  
+      
+      <header class="header-bar">
+          <h1>Dazzle Dash</h1>
+          
+          <div class="header-links">
+              {% if not user_logged_in %}
+                  <a href="{% url 'signup' %}">Signup</a> | <a href="{% url 'login' %}">Login</a> 
+              {% else %}
+                  <a href="{% url 'logout' %}">Logout</a> | <a href="{% url 'view_cart' %}">View Cart</a>
+              {% endif %}
+          </div>
+      </header>
+     
+      
+      
+     
+      <header class="header-bar">
+          
+      
+      <h2 class="shop-now-header">SHOP NOW</h2>
+  </header>
+      <ul>
+          {% for category in categories %}
+              <li>
+                  
+                  <img src="{% static 'bracelet.jpg' %}" alt="Bracelet">
+  
+  
+                  <a href="{% url 'category_products' category.0 %}">{{ category.1 }}</a>
+              </li>
+          {% endfor %}
+      </ul>
+      {% if is_admin %}
+      <form action="{% url 'add_category' %}" method="post">
+          {% csrf_token %}
+          <input type="text" name="category_name" required placeholder="Enter Category Name">
+          <button type="submit">Add Category</button>
+      </form>
+  {% endif %}
+  
+  </body>
+   -->
+  </html>
+  
+  

@@ -1,0 +1,144 @@
+
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Products</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f4;
+        }
+        .header-bar {
+            background-color: #7e3535;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header-links {
+            display: flex;
+            align-items: center;
+        }
+        .header-links a {
+            background-color: white;
+            color: #7e3535;
+            padding: 10px 15px;
+            border-radius: 5px;
+            text-decoration: none;
+        }
+        .header-links a:hover {
+            background-color: #f7f7f7;
+        }
+        h1, h2 {
+            text-align: center;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        li {
+            width: 200px;
+            height: 300px;
+            padding: 8px;
+            margin: 10px;
+            background: #f7f7f7;
+            border: 1px solid #ddd;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        li img {
+            width: auto;
+            max-height: 60%;
+            border-radius: 15px;
+        }
+        .product-description {
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #7e3535;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #5d2727;
+        }
+        a {
+            text-decoration: none;
+            color: black;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        /* Add these styles within your <style> tag */
+.link-button {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #7e3535;
+    color: white;
+    border-radius: 5px;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    align-items: center;
+}
+
+.link-button:hover {
+    background-color: #5d2727;
+}
+
+        
+    </style>
+</head>
+
+<body>
+    <header class="header-bar">
+        <h1 class="shop-now-header">Products</h1>
+        <div class="header-links">
+            <a href="{% url 'categories' %}">Home</a>
+        </div>
+    </header>
+
+    <h2>Products</h2>
+    <ul>
+        {% for product in products %}
+            <li>
+                <img src="{% static 'bracelet.jpg' %}" alt="Product Image" style="width:100px; height:100px;">
+                {% if is_admin %}
+                <form action="{% url 'update_product' product.0 %}" method="post">
+                    {% csrf_token %}
+                    <input type="text" name="description" value="{{ product.1 }}" class="editable-field">
+                    <input type="text" name="price" value="{{ product.2 }}" class="editable-field" pattern="^\d+(\.\d{1,2})?$">
+                    <button type="submit">Update</button>
+                </form>
+                {% else %}
+                <div>{{ product.1 }} - Price: ${{ product.2 }}</div>
+                <form action="{% url 'add_to_cart' product.0 %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit">Add to Cart</button>
+                </form>
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+    {% if is_admin %}
+    <a href="{% url 'add_product' %}?category_id={{ category_id }}" class="link-button">Add Product</a>
+    {% endif %}
+  
+</body>
+</html>
+

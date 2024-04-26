@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+{% load static %} 
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checkout - PayPal</title>
+</head>
+<body>
+  <div id="paypal-button-container"></div>
+  <p id="result-message"></p>
+  <!-- Insert your actual sandbox client-id -->
+  <script src="https://www.paypal.com/sdk/js?client-id=AYK5JEsWGBRcht58ghlPkzdZYyYbVgZdxWPrP9S6jdLaTtEjHQGVaU7MMaU55mEmaw2KrSR1zauIkzt2&components=buttons&enable-funding=paylater,venmo,card" data-sdk-integration-source="button-factory"></script>
+  <script src="{% static 'js/app.js' %}"></script>
+</body>
+</html>
+  

@@ -1,0 +1,39 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Checkout</title>
+    <!-- Add any stylesheets or Bootstrap for styling if necessary -->
+</head>
+<body>
+    <h2>Checkout</h2>
+    <div>
+        <h3>Your Cart</h3>
+        <table>
+            <tr>
+                <th>Product</th>
+                <th>Quantity</th>
+                <th>Price per Item</th>
+              
+                <th>Order ID</th>
+            </tr>
+            {% for item in cart_items %}
+            <tr>
+                <td>{{ item.name }}</td>
+                <td>{{ item.quantity }}</td>
+                <td>${{ item.price }}</td>
+                
+                <td>{{ item.order_id }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        <p><strong>Total Price: ${{ total_price }}</strong></p>
+    </div>
+    <div>
+        <h3>Payment Information</h3>
+        <!-- Payment form goes here -->
+        
+    </div>
+</body>
+</html>

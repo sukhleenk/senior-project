@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Your Cart</title>
+    <!-- Add your stylesheet links here -->
+</head>
+<body>
+    <h1>Your Shopping Cart</h1>
+    
+    <!-- Display for logged-in users -->
+    {% if cart_items %}
+        <ul>
+            {% for item in cart_items %}
+                <li>
+                    Product ID: {{ item.3 }} Quantity: {{ item.1 }}
+                    <!-- Assuming item.0 is the cart item ID for deletion -->
+                    <form action="{% url 'delete_from_cart' item.0 %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit">Remove</button>
+                    </form>
+                    <!-- Add additional product details -->
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Your cart is empty.</p>
+    {% endif %}
+    
+    <button type="button">Test Button</button>
+
+
+    <!-- Display for anonymous users (session-based cart) -->
+    {% if cart %}
+        <ul>
+            {% for product_id, quantity in cart.items %}
+                <li>
+                    Product ID: {{ product_id }} Quantity: {{ quantity }}
+                    <!-- Delete functionality for session-based cart might require different handling -->
+                    <form action="{% url 'delete_from_cart' product_id %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit">Remove</button>
+                    </form>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Your cart is empty.</p>
+    {% endif %}
+    
+    <a href="{% url 'checkout' %}">Proceed to Checkout</a>
+</body>
+</html>
+

@@ -1,0 +1,1 @@
+web: gunicorn 'wb2.wsgi'

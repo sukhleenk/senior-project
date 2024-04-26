@@ -1,0 +1,118 @@
+
+{% load static %}
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Product</title>
+    <style>
+       body {
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f4f4f4;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 20px;
+}
+h1 {
+    color: #7e3535;
+}
+form {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    margin-top: 20px;
+    width: 50%; /* Increased width of the form */
+    max-width: 500px; /* Ensures the form does not get too wide on larger screens */
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Centers the form elements */
+}
+div {
+    margin-bottom: 10px;
+    width: 100%; /* Ensures div takes full width of the form */
+}
+label {
+    display: block;
+    margin-bottom: 5px;
+    text-align: left; /* Aligns labels to the left */
+    width: 100%; /* Full width to align with inputs */
+}
+input, select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+button {
+    padding: 10px 20px;
+    background-color: #7e3535;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    display: block;
+    margin-top: 10px;
+    width: 100%; /* Button takes full width of the form section */
+}
+button:hover {
+    background-color: #5d2727;
+}
+a {
+    color: #7e3535;
+    text-decoration: none;
+    margin-top: 20px;
+    display: block;
+}
+a:hover {
+    text-decoration: underline;
+}
+
+    </style>
+</head>
+<body>
+    <h1>Add a New Product</h1>
+
+    {% if category_id %}
+    <form action="{% url 'add_product' %}" method="post">
+        {% csrf_token %}
+        <input type="hidden" name="category_id" value="{{ category_id }}">
+    {% else %}
+    <form action="{% url 'add_product' %}" method="post">
+        {% csrf_token %}
+    {% endif %}
+        <div>
+            <label for="description">Product Description:</label>
+            <input type="text" id="description" name="description" required placeholder="Enter Product Description">
+        </div>
+        <div>
+            <label for="price">Price:</label>
+            <input type="number" id="price" name="price" required placeholder="Enter Product Price">
+        </div>
+        <div>
+            <label for="inventory">Inventory:</label>
+            <input type="number" id="inventory" name="inventory" required placeholder="Enter Product Inventory">
+        </div>
+        {% if not category_id %}
+        <div>
+            <label for="category_id">Category:</label>
+            <select id="category_id" name="category_id" required>
+                {% for category in categories %}
+                <option value="{{ category.0 }}">{{ category.1 }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        {% endif %}
+        <button type="submit">Add Product</button>
+    </form>
+
+    <a href="{% url 'categories' %}">Go Back</a>
+
+</body>
+</html>

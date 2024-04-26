@@ -1,0 +1,103 @@
+<!-- 
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login or Signup Required</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        .header-bar {
+            background-color: #333;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+        }
+        a {
+            text-decoration: none;
+            color: black;
+            display: block; /* Makes the links block elements for easier clicking */
+            margin: 10px 0; /* Adds some space above and below each link */
+            text-align: center; /* Centers the text of the links */
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        h1, p {
+            text-align: center; /* Centers the heading and paragraph */
+            margin-top: 20px; /* Adds some space at the top */
+        }
+    </style>
+</head>
+<body>
+    <header class="header-bar">
+        <h1>Dazzle Dash</h1>
+    </header>
+
+    <h1>Login or Signup Required</h1>
+    <p>You must be logged in to add items to the cart. Please log in or sign up below.</p>
+    <a href="{% url 'login' %}">Login</a> | <a href="{% url 'signup' %}">Signup</a>
+</body>
+</html> -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login or Signup Required</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4; /* Consistent background color */
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        .header-bar {
+            background-color: #7e3535;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+        }
+        main {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        h1, p {
+            text-align: center;
+            margin-top: 10px;
+        }
+        a {
+            background-color: #7e3535;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 10px;
+            display: inline-block; /* Ensures the links are centered */
+        }
+        a:hover {
+            background-color: #7e3535;
+            text-decoration: none; /* Avoids underlining on hover */
+        }
+    </style>
+</head>
+<body>
+    <header class="header-bar">
+        <a href="{% url 'categories' %}">Home</a>
+        <span style="width: 75px;"></span>
+        <h1>Dazzle Dash</h1>
+    </header>
+    <main>
+        <h1>Login or Signup Required</h1>
+        <p>You must be logged in to add items to the cart. Please log in or sign up below.</p>
+        <a href="{% url 'login' %}">Login</a> | <a href="{% url 'signup' %}">Signup</a>
+    </main>
+</body>
+</html>
