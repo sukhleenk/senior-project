@@ -82,27 +82,27 @@ WSGI_APPLICATION = 'wb2.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'jewelry',          
-        'USER': 'root',
-        'PORT': '3306',
-        'PASSWORD': 'olemiss2024',
-        'HOST': '127.0.0.1',
-         }, 
-    }
-
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': 'railway',          ß
+#         'NAME': 'jewelry',          
 #         'USER': 'root',
-#         'PORT': '10374',
-#         'PASSWORD': 'ouqEbDMHGOPRTmHzBHFaoJgIzpqkpjIF',
-#         'HOST': 'monorail.proxy.rlwy.net',
+#         'PORT': '3306',
+#         'PASSWORD': 'olemiss2024',
+#         'HOST': '127.0.0.1',
 #          }, 
 #     }
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'railway',
+        'USER': 'root',
+        'PORT': '10374',
+        'PASSWORD': 'ouqEbDMHGOPRTmHzBHFaoJgIzpqkpjIF',
+        'HOST': 'monorail.proxy.rlwy.net',
+         }, 
+    }
 
 
 
