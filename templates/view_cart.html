@@ -6,76 +6,79 @@
         <title>SHOP NOW</title>
         {% load static %} 
         <style>
-            
             body {
-              margin: 0;
-              font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Prettier font */
-          }
-          .header-bar {
-              background-color: #7e3535;
-              color: white;
-              padding: 10px 20px;
-              display: flex;
-              justify-content: space-between; /* Adjusted for alignment */
-              align-items: center;
-          }
-          .header-links {
-              /* Additional styling for the link container */
-          }
-          .header-links a {
-              background-color: white; /* White background for buttons */
-              color: #7e3535; /* Color to match the header */
-              padding: 10px 15px;
-              border-radius: 5px; /* Rounded corners */
-              margin-left: 10px; /* Space between buttons */
-          }
-          .shop-now-header {
-              text-align: center;
-              margin-top: 20px;
-          }
-          ul {
-              list-style-type: none;
-              padding: 0;
-              display: flex;
-              flex-wrap: wrap;
-              justify-content: center;
-          }
-          li {
-              padding: 8px;
-              margin: 10px;
-              background: #f7f7f7;
-              border: 1px solid #ddd;
-              border-radius: 15px; /* Rounded corners for widgets */
-              text-align: center;
-          }
-          li img {
-              width: 100px; 
-              height: 100px; 
-              margin-bottom: 8px;
-              border-radius: 15px; /* Rounded corners for images */
-          }
-          a {
-              text-decoration: none;
-              color: black;
-              display: block;
-          }
-          a:hover {
-              text-decoration: underline;
-          }
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+        }
+        .header-bar {
+            background-color: #7e3535;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header-links a {
+            background-color: white;
+            color: #7e3535;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin-left: 10px;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        li {
+            padding: 8px;
+            margin: 10px;
+            background: #f7f7f7;
+            border: 1px solid #ddd;
+            border-radius: 15px;
+            text-align: center;
+        }
+        a {
+            text-decoration: none;
+            color: black;
+            display: block;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        form {
+            text-align: center;
+            margin-top: 20px;
+        }
+        input[type="text"], textarea {
+            padding: 10px;
+            margin-right: 5px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #7e3535;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #5d2727;
+        }
         </style>
         <script src="{% static 'js/app.js' %}" defer></script>
     </head>
 <body>
-    <a href="{% url 'categories' %}">Home</a>
+    
     <header class="header-bar">
         <h1>Dazzle Dash</h1>
-        
-        {% if not user_logged_in %}
-            <a href="{% url 'signup' %}">Signup</a> | <a href="{% url 'login' %}">Login</a> 
-        {% else %}
-            
-            <a href="{% url 'logout' %}">Logout</a> | <a href="{% url 'view_cart' %}">View Cart</a>
-        {% endif %}
+        <div class="header-links">
+            <a href="{% url 'categories' %}">Home</a> 
+        </div>
     </header>
 
     {% if cart_items %}

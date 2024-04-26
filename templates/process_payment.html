@@ -1,8 +1,42 @@
-{% extends 'base.html' %}
 
-{% block title %}Make Payment{% endblock %}
+ {% extends 'base.html' %}
 
-{% block content %}
-    <h4>Pay with PayPal</h4>
-    {{ form.render }}
-{% endblock %}
+
+ 
+ {% block content %}
+ 
+ <div>
+     <h3>Your Cart</h3>
+     <table>
+         <tr>
+             <th>Product</th>
+             <th>Quantity</th>
+             <th>Price</th>
+         </tr>
+         {% for item in cart_items %}
+         <tr>
+             <td>{{ item.name }}</td>
+             <td>{{ item.quantity }}</td>
+             <td>${{ item.price }}</td>
+         </tr>
+         {% endfor %}
+     </table>
+     <p><strong>Total Price: ${{ total_price }}</strong></p>
+ </div>
+ 
+ <div>
+     <h3>Shipping Address</h3>
+     <form action="{% url 'checkout' %}" method="post">
+         {% csrf_token %}
+         <textarea name="address" rows="4" cols="50" required>{{ address }}</textarea>
+         <button type="submit">Update Address</button>
+     </form>
+ </div>
+ 
+ <div>
+     <h4>Pay with PayPal</h4>
+     {{ form.render }}
+ </div>
+ 
+ {% endblock %}
+ 

@@ -45,7 +45,7 @@ from django.shortcuts import redirect
 
 
 def login(request):
-    if request.method == 'POST':
+    if request.method == 'POST':   
         username = request.POST.get('username')
         password = request.POST.get('password')
 
@@ -112,6 +112,51 @@ def fetch_products_by_category(request, category_id):
         'category_id': category_id,
         'is_admin': is_admin
     })
+
+from django.http import JsonResponse, HttpResponseBadRequest
+from django.db import connection
+
+# def add_to_cart(request, product_id):
+#     if not request.is_ajax():
+#         return HttpResponseBadRequest("Invalid request type")
+
+#     print("Session data:", request.session.items())
+#     if 'user_id' not in request.session:
+#         # Return a JSON response indicating the user is not logged in
+#         return JsonResponse({'error': 'User not logged in'}, status=403)
+
+#     user_id = request.session['user_id']
+#     quantity = 1  # Assuming we add one product at a time
+
+#     with connection.cursor() as cursor:
+#         # First, check if there is an existing order for the user
+#         cursor.execute("SELECT order_id FROM cart WHERE Users_UserID = %s LIMIT 1", [user_id])
+#         order_id_result = cursor.fetchone()
+        
+#         if order_id_result:
+#             order_id = order_id_result[0]
+#         else:
+#             # If there is no existing order, create a new order_id
+#             cursor.execute("SELECT MAX(order_id) FROM cart")
+#             max_order_id_result = cursor.fetchone()
+#             max_order_id = max_order_id_result[0] if max_order_id_result and max_order_id_result[0] else 0
+#             order_id = max_order_id + 1
+
+#         # Check if the product is already in the user's cart
+#         cursor.execute("SELECT CartID, quantity FROM cart WHERE Users_UserID = %s AND Products_ProductID = %s", [user_id, product_id])
+#         cart_item = cursor.fetchone()
+        
+#         if cart_item:
+#             # If the item exists, update the quantity
+#             new_quantity = cart_item[1] + quantity
+#             cursor.execute("UPDATE cart SET quantity = %s WHERE CartID = %s", [new_quantity, cart_item[0]])
+#         else:
+#             # If the item does not exist, add a new item to the cart
+#             cursor.execute("INSERT INTO cart (quantity, Users_UserID, Products_ProductID, order_id) VALUES (%s, %s, %s, %s)", [quantity, user_id, product_id, order_id])
+#             new_quantity = quantity  # As it's a new item, the quantity will be what we're adding now
+
+#     # Return a JSON response indicating success and the updated quantity in the cart
+#     return JsonResponse({'message': 'Item added to cart', 'cartQuantity': new_quantity})
 
 def add_to_cart(request, product_id):
     print("Session data:", request.session.items())
@@ -333,27 +378,29 @@ def update_product(request, product_id):
         return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
 
     return HttpResponseRedirect('/')
-# def checkout(request):
-    
-#      return render(request, 'payment.html')
+
 
 from paypal.standard.forms import PayPalPaymentsForm
 
+
+
 def checkout(request):
     if 'user_id' not in request.session:
-      
         return HttpResponseRedirect(reverse('login'))
     
     user_id = request.session['user_id']
 
+    # Fetch cart items and user address
     with connection.cursor() as cursor:
         cursor.execute("""
-            SELECT c.CartID, c.quantity, c.order_id, p.ProductID, p.description, p.price
+            SELECT c.CartID, c.quantity, c.order_id, p.ProductID, p.description, p.price, u.address
             FROM cart c
             JOIN products p ON c.Products_ProductID = p.ProductID
+            JOIN users u ON c.Users_UserID = u.UserID
             WHERE c.Users_UserID = %s
         """, [user_id])
-        cart_items = cursor.fetchall()
+        results = cursor.fetchall()
+        address = results[0][6] if results else None
 
     cart_items_dicts = [{
         'cart_id': item[0],
@@ -362,19 +409,24 @@ def checkout(request):
         'product_id': item[3],
         'name': item[4],
         'price': item[5]
-    } for item in cart_items]
-
-
-    cart_items_json = json.dumps(cart_items_dicts)
-
+    } for item in results]
 
     total_price = sum(item['quantity'] * item['price'] for item in cart_items_dicts)
-    
+
+    # Handle address update from POST request
+    if request.method == 'POST' and 'address' in request.POST:
+        new_address = request.POST['address']
+        # Update the address in the database
+        with connection.cursor() as cursor:
+            cursor.execute("UPDATE users SET address = %s WHERE UserID = %s", [new_address, user_id])
+        messages.success(request, "Address updated successfully!")
+        return redirect('checkout')  # Refresh the page to show updated address
+
     paypal_dict = {
-        'business': PAYPAL_RECEIVER_EMAIL,
+        'business': 'PAYPAL_RECEIVER_EMAIL',
         'amount': '%.2f' % total_price,
-        'item_name': 'Order {}'.format(cart_items[0][2]), # using the order_id which is the same for every thing else
-        'invoice': str(cart_items[0][2]),
+        'item_name': 'Order {}'.format(cart_items_dicts[0]['order_id']),
+        'invoice': str(cart_items_dicts[0]['order_id']),
         'currency_code': 'USD',
         'notify_url': 'http://{}{}'.format(request.get_host(), reverse('paypal-ipn')),
         'return_url': 'http://{}{}'.format(request.get_host(), reverse('payment_done')),
@@ -383,19 +435,48 @@ def checkout(request):
 
     form = PayPalPaymentsForm(initial=paypal_dict)
 
-    return render(request, 'process_payment.html', {'order': cart_items[0][2], 'form': form})
-
-    # return render(request, 'payment.html', {
-    #     'cart_items_json': cart_items_json,
-    #     'cart_items': cart_items_dicts,  
-    #     'total_price': total_price,  
-    #     'user_id': user_id  
-    # })
+    return render(request, 'process_payment.html', {
+        'order_id': cart_items_dicts[0]['order_id'],
+        'form': form,
+        'cart_items': cart_items_dicts,
+        'total_price': total_price,
+        'user_id': user_id,
+        'address': address
+    })
 
 
 from django import template
 
 register = template.Library()
+
+
+
+
+
+
+
+def process_payment(request):
+    order_id = request.session.get('order_id')
+    order = get_object_or_404(Order, id=order_id)
+    host = request.get_host()
+
+    paypal_dict = {
+        'business': settings.PAYPAL_RECEIVER_EMAIL,
+        'amount': '%.2f' % order.total_cost().quantize(
+            Decimal('.01')),
+        'item_name': 'Order {}'.format(order.id),
+        'invoice': str(order.id),
+        'currency_code': 'USD',
+        'notify_url': 'http://{}{}'.format(host,
+                                           reverse('paypal-ipn')),
+        'return_url': 'http://{}{}'.format(host,
+                                           reverse('payment_done')),
+        'cancel_return': 'http://{}{}'.format(host,
+                                              reverse('payment_cancelled')),
+    }
+
+    form = PayPalPaymentsForm(initial=paypal_dict)
+    return render(request, 'process_payment.html', {'order': order, 'form': form})
 
 @csrf_exempt
 def payment_done(request):
@@ -406,3 +487,4 @@ def payment_done(request):
 def payment_canceled(request):
     return render(request, 'payment_cancelled.html')
 
+        
