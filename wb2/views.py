@@ -116,47 +116,7 @@ def fetch_products_by_category(request, category_id):
 from django.http import JsonResponse, HttpResponseBadRequest
 from django.db import connection
 
-# def add_to_cart(request, product_id):
-#     if not request.is_ajax():
-#         return HttpResponseBadRequest("Invalid request type")
 
-#     print("Session data:", request.session.items())
-#     if 'user_id' not in request.session:
-#         # Return a JSON response indicating the user is not logged in
-#         return JsonResponse({'error': 'User not logged in'}, status=403)
-
-#     user_id = request.session['user_id']
-#     quantity = 1  # Assuming we add one product at a time
-
-#     with connection.cursor() as cursor:
-#         # First, check if there is an existing order for the user
-#         cursor.execute("SELECT order_id FROM cart WHERE Users_UserID = %s LIMIT 1", [user_id])
-#         order_id_result = cursor.fetchone()
-        
-#         if order_id_result:
-#             order_id = order_id_result[0]
-#         else:
-#             # If there is no existing order, create a new order_id
-#             cursor.execute("SELECT MAX(order_id) FROM cart")
-#             max_order_id_result = cursor.fetchone()
-#             max_order_id = max_order_id_result[0] if max_order_id_result and max_order_id_result[0] else 0
-#             order_id = max_order_id + 1
-
-#         # Check if the product is already in the user's cart
-#         cursor.execute("SELECT CartID, quantity FROM cart WHERE Users_UserID = %s AND Products_ProductID = %s", [user_id, product_id])
-#         cart_item = cursor.fetchone()
-        
-#         if cart_item:
-#             # If the item exists, update the quantity
-#             new_quantity = cart_item[1] + quantity
-#             cursor.execute("UPDATE cart SET quantity = %s WHERE CartID = %s", [new_quantity, cart_item[0]])
-#         else:
-#             # If the item does not exist, add a new item to the cart
-#             cursor.execute("INSERT INTO cart (quantity, Users_UserID, Products_ProductID, order_id) VALUES (%s, %s, %s, %s)", [quantity, user_id, product_id, order_id])
-#             new_quantity = quantity  # As it's a new item, the quantity will be what we're adding now
-
-#     # Return a JSON response indicating success and the updated quantity in the cart
-#     return JsonResponse({'message': 'Item added to cart', 'cartQuantity': new_quantity})
 
 def add_to_cart(request, product_id):
     print("Session data:", request.session.items())
