@@ -5,45 +5,82 @@
 <head>
     <title>{% block title %}My Shop{% endblock %}</title>
     <style>
-        /* Global styles */
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-        }
-        .header-bar {
-            background-color: #333;
-            color: white;
-            padding: 10px 20px;
-            text-align: center;
-        }
-        a {
-            text-decoration: none;
-            color: black;
-        }
-        a:hover {
-            text-decoration: underline;
-        }
-        ul {
-            list-style-type: none;
-            padding: 0;
-        }
-        li {
-            margin-bottom: 20px;
-        }
-        /* Add other global styles here */
-    </style>
+
+.header-bar {
+              background-color: #7e3535;
+              color: white;
+              padding: 10px 20px;
+              display: flex;
+              justify-content: space-between; /* Adjusted for alignment */
+              align-items: center;
+          } 
+         
+          .header-links a {
+              background-color: white; /* White background for buttons */
+              color: #7e3535; /* Color to match the header */
+              padding: 10px 15px;
+              border-radius: 5px; /* Rounded corners */
+              margin-left: 10px; /* Space between buttons */
+          }
+
+table {
+    width: 100%;
+    margin-top: 20px;
+    border-collapse: collapse;
+}
+
+table, th, td {
+    border: 1px solid #ddd;
+}
+
+th, td {
+    text-align: left;
+    padding: 8px;
+}
+
+th {
+    background-color: #7e3535;
+    color: white;
+}
+
+tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+textarea {
+    width: 100%;
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    resize: vertical; /* Allows vertical resizing, might want to disable this with 'none' */
+}
+
+/* Style updates for buttons on the 'Your Cart' page */
+form button[type="submit"], .link-button {
+    background-color: #7e3535;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+    width: 100%;
+}
+
+form button[type="submit"]:hover, .link-button:hover {
+    background-color: #5d2727;
+}
+        </style>        
 </head>
 <body>
     <header class="header-bar">
         <h1>Dazzle Dash</h1>
-        {% if not user_logged_in %}
-            <a href="{% url 'signup' %}">Signup</a> | <a href="{% url 'login' %}">Login</a> 
-        {% else %}
-            <a href="{% url 'logout' %}">Logout</a> | <a href="{% url 'view_cart' %}">View Cart</a>
-        {% endif %}
+        
     </header>
     {% block content %}
-    <!-- Content will go here for each page that extends this template -->
+
     {% endblock %}
 </body>
 </html>

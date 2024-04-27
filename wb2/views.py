@@ -15,6 +15,8 @@ from django.contrib.auth import authenticate,login as auth_login, login, logout
 from django.contrib import messages
 from .settings import PAYPAL_RECEIVER_EMAIL
 import json
+import stripe
+
 
 
 
@@ -97,25 +99,34 @@ def add_category(request):
     # If it's a GET request or the user is not an admin, just show the add category form
     return render(request, 'categories')
 
-
-  
 def fetch_products_by_category(request, category_id):
+    # Determine if the user is an admin or not.
+    is_admin = request.session.get('is_admin', False)
+    
+    # The SQL query changes depending on the admin status. Admins see all products, while others see only visible products.
+    if is_admin:
+        query = "SELECT * FROM Products WHERE Categories_category = %s"
+        params = [category_id]
+    else:
+        query = "SELECT * FROM Products WHERE Categories_category = %s AND is_visible = 1"
+        params = [category_id]
+
     with connection.cursor() as cursor:
-        cursor.execute("SELECT * FROM Products WHERE Categories_category = %s", [category_id])
+        cursor.execute(query, params)
         products = cursor.fetchall()
 
-    is_admin = request.session.get('is_admin', False)
-
-    #$return render(request, 'products.html', {'products': products})
     return render(request, 'products.html', {
         'products': products,
         'category_id': category_id,
         'is_admin': is_admin
     })
 
+
+  
+
+
 from django.http import JsonResponse, HttpResponseBadRequest
 from django.db import connection
-
 
 
 def add_to_cart(request, product_id):
@@ -344,49 +355,61 @@ from paypal.standard.forms import PayPalPaymentsForm
 
 
 
+
 def checkout(request):
     if 'user_id' not in request.session:
         return HttpResponseRedirect(reverse('login'))
     
     user_id = request.session['user_id']
+    address = ''  # Initialize address as an empty string
 
-    # Fetch cart items and user address
+    # Query to fetch the user's address separately
     with connection.cursor() as cursor:
         cursor.execute("""
-            SELECT c.CartID, c.quantity, c.order_id, p.ProductID, p.description, p.price, u.address
+            SELECT address FROM users WHERE UserID = %s
+        """, [user_id])
+        address_result = cursor.fetchone()
+        if address_result:
+            address = address_result[0] if address_result[0] else ''
+
+    # Query to fetch cart items
+    cart_items_dicts = []
+    total_price = 0
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT c.CartID, c.quantity, c.order_id, p.ProductID, p.description, p.price
             FROM cart c
             JOIN products p ON c.Products_ProductID = p.ProductID
-            JOIN users u ON c.Users_UserID = u.UserID
             WHERE c.Users_UserID = %s
         """, [user_id])
         results = cursor.fetchall()
-        address = results[0][6] if results else None
 
-    cart_items_dicts = [{
-        'cart_id': item[0],
-        'quantity': item[1],
-        'order_id': item[2],
-        'product_id': item[3],
-        'name': item[4],
-        'price': item[5]
-    } for item in results]
+        cart_items_dicts = [{
+            'cart_id': item[0],
+            'quantity': item[1],
+            'order_id': item[2],
+            'product_id': item[3],
+            'name': item[4],
+            'price': item[5]
+        } for item in results]
 
-    total_price = sum(item['quantity'] * item['price'] for item in cart_items_dicts)
+        total_price = sum(item['quantity'] * item['price'] for item in cart_items_dicts) if cart_items_dicts else 0
 
-    # Handle address update from POST request
-    if request.method == 'POST' and 'address' in request.POST:
-        new_address = request.POST['address']
-        # Update the address in the database
+    # Check for POST request to update address
+    if request.method == 'POST':
+        new_address = request.POST.get('address', '').strip()
         with connection.cursor() as cursor:
             cursor.execute("UPDATE users SET address = %s WHERE UserID = %s", [new_address, user_id])
+
         messages.success(request, "Address updated successfully!")
         return redirect('checkout')  # Refresh the page to show updated address
 
+    # PayPal setup remains the same
     paypal_dict = {
-        'business': 'PAYPAL_RECEIVER_EMAIL',
+        'business': PAYPAL_RECEIVER_EMAIL,
         'amount': '%.2f' % total_price,
-        'item_name': 'Order {}'.format(cart_items_dicts[0]['order_id']),
-        'invoice': str(cart_items_dicts[0]['order_id']),
+        'item_name': 'Order {}'.format(cart_items_dicts[0]['order_id'] if cart_items_dicts else 'N/A'),
+        'invoice': str(cart_items_dicts[0]['order_id'] if cart_items_dicts else 'N/A'),
         'currency_code': 'USD',
         'notify_url': 'http://{}{}'.format(request.get_host(), reverse('paypal-ipn')),
         'return_url': 'http://{}{}'.format(request.get_host(), reverse('payment_done')),
@@ -396,13 +419,29 @@ def checkout(request):
     form = PayPalPaymentsForm(initial=paypal_dict)
 
     return render(request, 'process_payment.html', {
-        'order_id': cart_items_dicts[0]['order_id'],
+        'order_id': cart_items_dicts[0]['order_id'] if cart_items_dicts else None,
         'form': form,
         'cart_items': cart_items_dicts,
         'total_price': total_price,
         'user_id': user_id,
-        'address': address
+        'address': address  # Pass the fetched address to the template
     })
+
+
+
+def toggle_visibility(request, product_id):
+    if 'user_id' not in request.session or not request.session.get('is_admin', False):
+        return redirect('login')
+
+    if request.method == 'POST':
+        with connection.cursor() as cursor:
+            cursor.execute("""
+                UPDATE products SET is_visible = NOT is_visible WHERE ProductID= %s
+            """, [product_id])
+
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+    return HttpResponseRedirect('/')
+
 
 
 from django import template

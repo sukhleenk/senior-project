@@ -101,15 +101,37 @@
     background-color: #5d2727;
 }
 
+.header-links a,
+        .header-links .link-button {
+            margin-right: 10px; /* Adds space between the links */
+            display: inline-block; /* Ensures that the links are aligned properly */
+            text-align: center; /* Center text inside the links */
+        }
+
+        /* Ensuring the header links don't wrap or overlap */
+        .header-links {
+            display: flex;
+            flex-wrap: nowrap; /* Prevents wrapping of header items */
+        }
+
+        /* You may also want to add a media query if the buttons still overlap on smaller screens */
+        @media (max-width: 600px) {
+            .header-links a,
+            .header-links .link-button {
+                padding: 5px 10px; /* Reduces padding on smaller screens */
+                font-size: 0.9em; /* Reduces font size on smaller screens */
+            }
+        }
         
     </style>
 </head>
 
 <body>
     <header class="header-bar">
-        <h1 class="shop-now-header">Products</h1>
+        <h1 class="shop-now-header">Dazzle Dash</h1>
         <div class="header-links">
             <a href="{% url 'categories' %}">Home</a>
+            <a href="{% url 'view_cart' %}" class="link-button">View Cart</a>
         </div>
     </header>
 
@@ -118,7 +140,15 @@
         {% for product in products %}
             <li>
                 <img src="{% static 'bracelet.jpg' %}" alt="Product Image" style="width:100px; height:100px;">
+                <div>{{ product.1 }} - Price: ${{ product.2 }}</div>
+                
+                <!-- Visibility Toggle Button for Admins -->
                 {% if is_admin %}
+                <form action="{% url 'toggle_visibility' product.0 %}" method="post" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit">{{ product.is_visible|yesno:"Hide,Show" }}</button>
+                </form>
+
                 <form action="{% url 'update_product' product.0 %}" method="post">
                     {% csrf_token %}
                     <input type="text" name="description" value="{{ product.1 }}" class="editable-field">
@@ -126,12 +156,6 @@
                     <button type="submit">Update</button>
                 </form>
                 {% else %}
-                <div>{{ product.1 }} - Price: ${{ product.2 }}</div>
-                <!-- <form action="{% url 'add_to_cart' product.0 %}" method="post" class="add-to-cart-form">
-                    {% csrf_token %}
-                    <button type="submit">Add to Cart</button>
-                </form> -->
-                
                 <form action="{% url 'add_to_cart' product.0 %}" method="post">
                     {% csrf_token %}
                     <button type="submit">Add to Cart</button>
@@ -143,34 +167,9 @@
     {% if is_admin %}
     <a href="{% url 'add_product' %}?category_id={{ category_id }}" class="link-button">Add Product</a>
     {% endif %}
-
-    <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<script>
-    $(document).ready(function() {
-        $('form.add-to-cart-form').on('submit', function(e) {
-            e.preventDefault(); // Prevent the form from submitting via the browser's default action
-
-            var form = $(this);
-            var url = form.attr('action'); // Get the URL to which the form data should be submitted
-
-            $.ajax({
-                type: "POST",
-                url: url,
-                data: form.serialize(), // Serialize form data
-                success: function(response) {
-                    alert(response.message); // Display a message on success
-                    // Optionally update any part of your page here, like cart count or cart details
-                },
-                error: function(xhr, status, error) {
-                    // Handle errors here
-                    alert('Error: ' + error);
-                }
-            });
-        });
-    });
-</script> -->
-
-  
+    {% if user.is_authenticated %}
+    <a href="{% url 'view_cart' %}" class="link-button">View Cart</a>
+{% endif %}
 </body>
 </html>
 

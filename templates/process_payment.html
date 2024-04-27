@@ -25,13 +25,34 @@
  </div>
  
  <div>
-     <h3>Shipping Address</h3>
-     <form action="{% url 'checkout' %}" method="post">
-         {% csrf_token %}
-         <textarea name="address" rows="4" cols="50" required>{{ address }}</textarea>
-         <button type="submit">Update Address</button>
-     </form>
- </div>
+    <h3>Shipping Address</h3>
+    <p>Current Address:</p>
+    <div style="margin-bottom: 20px; padding: 10px; background-color: #f7f7f7; border: 1px solid #ddd; border-radius: 5px;">
+        {{ address }}
+    </div>
+    <form action="{% url 'checkout' %}" method="post">
+        {% csrf_token %}
+        <!-- Split address into multiple fields -->
+        <div>
+            <label for="street_name">Street Name:</label>
+            <input type="text" id="street_name" name="street_name" required value="{{ address.street_name|default_if_none:'' }}">
+        </div>
+        <div>
+            <label for="city_town">City/Town:</label>
+            <input type="text" id="city_town" name="city_town" required value="{{ address.city_town|default_if_none:'' }}">
+        </div>
+        <div>
+            <label for="state">State:</label>
+            <input type="text" id="state" name="state" required value="{{ address.state|default_if_none:'' }}">
+        </div>
+        <div>
+            <label for="zipcode">Zipcode:</label>
+            <input type="text" id="zipcode" name="zipcode" required value="{{ address.zipcode|default_if_none:'' }}">
+        </div>
+        
+        <button type="submit">Update Address</button>
+    </form>
+</div>
  
  <div>
      <h4>Pay with PayPal</h4>
