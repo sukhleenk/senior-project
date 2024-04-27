@@ -103,10 +103,10 @@ def fetch_products_by_category(request, category_id):
     
     # The SQL query changes depending on the admin status. Admins see all products, while others see only visible products.
     if is_admin:
-        query = "SELECT * FROM Products WHERE Categories_category = %s"
+        query = "SELECT * FROM products WHERE Categories_category = %s"
         params = [category_id]
     else:
-        query = "SELECT * FROM Products WHERE Categories_category = %s AND is_visible = 1"
+        query = "SELECT * FROM products WHERE Categories_category = %s AND is_visible = 1"
         params = [category_id]
 
     with connection.cursor() as cursor:
