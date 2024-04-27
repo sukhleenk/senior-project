@@ -163,7 +163,8 @@ def add_to_cart(request, product_id):
             cursor.execute("INSERT INTO cart (quantity, Users_UserID, Products_ProductID, order_id) VALUES (%s, %s, %s, %s)", [quantity, user_id, product_id, order_id])
             print(f"Product ID {product_id} added to cart with Order ID {order_id}")
     
-    return HttpResponse("Item added to cart.")
+    # return HttpResponse("Item added to cart.")
+    return redirect('view_cart')
 
 
 def login_or_signup_page(request):
