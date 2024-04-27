@@ -419,6 +419,7 @@ def checkout(request):
 
     return render(request, 'process_payment.html', {
         'order_id': cart_items_dicts[0]['order_id'] if cart_items_dicts else None,
+        'edit_address': False,
         'form': form,
         'cart_items': cart_items_dicts,
         'total_price': total_price,

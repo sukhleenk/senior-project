@@ -30,7 +30,10 @@
     <div style="margin-bottom: 20px; padding: 10px; background-color: #f7f7f7; border: 1px solid #ddd; border-radius: 5px;">
         {{ address }}
     </div>
-    <form action="{% url 'checkout' %}" method="post">
+
+    <button id="edit-address-btn">Edit Address</button>
+
+    <form action="{% url 'checkout' %}" method="post" id="address-form" style="display: none;">
         {% csrf_token %}
         <!-- Split address into multiple fields -->
         <div>
@@ -58,6 +61,23 @@
      <h4>Pay with PayPal</h4>
      {{ form.render }}
  </div>
+
+ <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const editAddressBtn = document.getElementById('edit-address-btn');
+        const addressForm = document.getElementById('address-form');
+
+        editAddressBtn.addEventListener('click', function() {
+            // Toggle the visibility of the address form
+            if (addressForm.style.display === 'none') {
+                addressForm.style.display = 'block';
+            } else {
+                addressForm.style.display = 'none';
+            }
+        });
+    });
+</script>
+
  
  {% endblock %}
  
