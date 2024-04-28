@@ -53,6 +53,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.auth.middleware.RemoteUserMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware'
 ]
 
 
@@ -172,6 +173,8 @@ PROJECT_ROOT = os.path.normpath(os.path.dirname(__file__))
 STATICFILES_DIRS = [
     os.path.join(PROJECT_ROOT, '..', 'static'),
 ]
+
+STATICFILES_STORAGE ='whitenoise.storage.StaticFilesStorage'
 
 # settings.py
 
