@@ -417,15 +417,15 @@ def checkout(request):
 
     form = PayPalPaymentsForm(initial=paypal_dict)
 
-    # return render(request, 'process_payment.html', {
-    #     'order_id': cart_items_dicts[0]['order_id'] if cart_items_dicts else None,
-    #     'edit_address': False,
-    #     'form': form,
-    #     'cart_items': cart_items_dicts,
-    #     'total_price': total_price,
-    #     'user_id': user_id,
-    #     'address': address  # Pass the fetched address to the template
-    # })
+    return render(request, 'process_payment.html', {
+        'order_id': cart_items_dicts[0]['order_id'] if cart_items_dicts else None,
+        'edit_address': False,
+        'form': form,
+        'cart_items': cart_items_dicts,
+        'total_price': total_price,
+        'user_id': user_id,
+        'address': address  # Pass the fetched address to the template
+    })
 
     #! FOR TESTING 
     return redirect('payment_done')
