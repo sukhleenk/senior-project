@@ -111,7 +111,7 @@
     <ul>
         {% for category in categories %}
             <li>
-                <img src="{% static 'bracelet.jpg' %}" alt="Bracelet">
+                <img src="{% static category.1|add:'.jpg' %}" alt="{{ category.1 }}">
                 <a href="{% url 'category_products' category.0 %}">{{ category.1 }}</a>
             </li>
         {% endfor %}

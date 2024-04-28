@@ -139,7 +139,7 @@
     <ul>
         {% for product in products %}
             <li>
-                <img src="{% static 'bracelet.jpg' %}" alt="Product Image" style="width:100px; height:100px;">
+                <img src="{% static product.1|add:'.jpg' %}" alt="Product Image" style="width:100px; height:100px;">
                 <div>{{ product.1 }} - Price: ${{ product.2 }}</div>
                 
                 <!-- Visibility Toggle Button for Admins -->
