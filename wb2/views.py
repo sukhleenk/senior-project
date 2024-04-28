@@ -427,6 +427,9 @@ def checkout(request):
         'address': address  # Pass the fetched address to the template
     })
 
+    #! FOR TESTING 
+    return redirect('payment_done')
+
 
 
 def toggle_visibility(request, product_id):
@@ -479,7 +482,67 @@ def process_payment(request):
 
 @csrf_exempt
 def payment_done(request):
-    return render(request, 'payment_done.html')
+    if 'user_id' not in request.session:
+        return HttpResponseRedirect(reverse('login'))
+    
+    user_id = request.session['user_id']
+
+    cart_items_dicts = []
+    total_price = 0
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT c.CartID, c.quantity, c.order_id, p.ProductID, p.description, p.price
+            FROM cart c
+            JOIN products p ON c.Products_ProductID = p.ProductID
+            WHERE c.Users_UserID = %s
+        """, [user_id])
+
+        results = cursor.fetchall()
+
+        cart_items_dicts = [{
+            'cart_id': item[0],
+            'quantity': item[1],
+            'order_id': item[2],
+            'product_id': item[3],
+            'name': item[4],
+            'price': item[5]
+        } for item in results]
+
+        total_price = sum(item['quantity'] * item['price'] for item in cart_items_dicts) if cart_items_dicts else 0
+
+    # return render(request, 'process_payment.html', {
+    #     'order_id': cart_items_dicts[0]['order_id'] if cart_items_dicts else None,
+    #     'edit_address': False,
+    #     'form': form,
+    #     'cart_items': cart_items_dicts,
+    #     'total_price': total_price,
+    #     'user_id': user_id,
+    #     'address': address  # Pass the fetched address to the template
+    # })
+
+    # Clear the cart after payment is done
+    with connection.cursor() as cursor:
+        cursor.execute("DELETE FROM cart WHERE Users_UserID = %s", [user_id])
+
+    # add the order to the order table
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT MAX(OrderID) FROM orders")
+        max_order_id = cursor.fetchone()[0] or 0
+        order_id = max_order_id + 1
+        # get today's date and store it into a variable 
+        cursor.execute("SELECT CURDATE()")
+        date = cursor.fetchone()[0]
+
+        cursor.execute("INSERT INTO orders (orderID, date, totalPrice, Users_UserID) VALUES (%s, %s, %s, %s)", [order_id, date, total_price, user_id])
+
+        for item in cart_items_dicts:
+            cursor.execute("INSERT INTO order_items (Orders_OrderID, Products_ProductID, quantity) VALUES (%s, %s, %s)", [order_id, item['product_id'], item['quantity']])
+
+    return render(request, 'payment_done.html', {
+        'cart_items': cart_items_dicts,
+        'total_price': total_price,
+        'order_id': cart_items_dicts[0]['order_id'] if cart_items_dicts else None
+    })
 
 
 @csrf_exempt
