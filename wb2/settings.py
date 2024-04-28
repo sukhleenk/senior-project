@@ -23,7 +23,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '3jk9lixnct-&vqca&nwm)k8g#q#l4lffaru!=9a#q+nudd=5-$'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*', 'localhost', '127.0.0.1', '[::1]', '']
 CSRF_TRUSTED_ORIGINS = ['https://web-production-185f7.up.railway.app','https://*.127.0.0.1']
