@@ -78,14 +78,14 @@
         </style>
         <script src="{% static 'js/app.js' %}" defer></script>
     </head>
+
 <body>
-    
     <header class="header-bar">
         <h1 class="shop-now-header">Dazzle Dash</h1>
         <div class="header-links">
             <a href="{% url 'categories' %}">Home</a>
-            <a href="{% url 'view_cart' %}">View Cart</a>
-            <a href="{% url 'account' %}" class="link-button">Account</a>
+            <!-- <a href="{% url 'account' %}" class="link-button">Account</a> -->
+            <a href="{% url 'logout' %}" class="link-button">Logout</a>
         </div>
     </header>
 
@@ -112,6 +112,12 @@
             </tr>
             {% endfor %}
         </table>
+
+        <!-- Form for delete button -->
+        <form action="{% url 'delete_order' item.order_id %}" method="post">
+            {% csrf_token %}
+            <button type="submit">Delete</button>
+        </form>
     {% endfor %}
 
 

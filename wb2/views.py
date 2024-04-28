@@ -417,15 +417,15 @@ def checkout(request):
 
     form = PayPalPaymentsForm(initial=paypal_dict)
 
-    return render(request, 'process_payment.html', {
-        'order_id': cart_items_dicts[0]['order_id'] if cart_items_dicts else None,
-        'edit_address': False,
-        'form': form,
-        'cart_items': cart_items_dicts,
-        'total_price': total_price,
-        'user_id': user_id,
-        'address': address  # Pass the fetched address to the template
-    })
+    # return render(request, 'process_payment.html', {
+    #     'order_id': cart_items_dicts[0]['order_id'] if cart_items_dicts else None,
+    #     'edit_address': False,
+    #     'form': form,
+    #     'cart_items': cart_items_dicts,
+    #     'total_price': total_price,
+    #     'user_id': user_id,
+    #     'address': address  # Pass the fetched address to the template
+    # })
 
     #! FOR TESTING 
     return redirect('payment_done')
@@ -548,7 +548,7 @@ def orders(request):
     # Retrieve current open orders
     with connection.cursor() as cursor:
         cursor.execute("""
-            SELECT orders.orderID, orders.Users_UserID, orders.date, users.Username, users.Email
+            SELECT orders.orderID, orders.Users_UserID, orders.date, orders.totalPrice, users.Username, users.Email
             FROM orders
             INNER JOIN users ON orders.Users_UserID = users.UserID
             WHERE orders.fulfilled = 0
@@ -578,10 +578,11 @@ def orders(request):
                 'order_id': order[0],
                 'user': {
                     'user_id': order[1],
-                    'username': order[3],
-                    'email': order[4]
+                    'username': order[4],
+                    'email': order[5]
                 },
                 'date': order[2],
+                'total': order[3],
                 'items': current_order_items
             }
             current_orders_full.append(current_order_dict)
@@ -589,7 +590,7 @@ def orders(request):
     # Retrieve past orders
     with connection.cursor() as cursor:
         cursor.execute("""
-            SELECT orders.orderID, orders.Users_UserID, orders.date, users.Username, users.Email
+            SELECT orders.orderID, orders.Users_UserID, orders.date, orders.totalPrice, users.Username, users.Email
             FROM orders
             INNER JOIN users ON orders.Users_UserID = users.UserID
             WHERE orders.fulfilled = 1
@@ -619,10 +620,11 @@ def orders(request):
                 'order_id': order[0],
                 'user': {
                     'user_id': order[1],
-                    'username': order[3],
-                    'email': order[4]
+                    'username': order[4],
+                    'email': order[5]
                 },
                 'date': order[2],
+                'total': order[3],
                 'items': past_order_items
             }
             past_orders_full.append(past_order_dict)
@@ -632,16 +634,30 @@ def orders(request):
         'past_orders': past_orders_full
     })
 
+@require_POST
+def delete_order(request, order_id):
+    # Delete order from the orders table
+    with connection.cursor() as cursor:
+        try:
+            cursor.execute("DELETE FROM orders WHERE OrderID = %s", [order_id])
+        except Exception as e:
+            # Handle any database errors
+            return HttpResponseBadRequest("Error deleting order")
 
+    # Delete order items from the order_items table
+    with connection.cursor() as cursor:
+        try:
+            cursor.execute("DELETE FROM order_items WHERE Orders_OrderID = %s", [order_id])
+        except Exception as e:
+            # Handle any database errors
+            return HttpResponseBadRequest("Error deleting order items")
+
+    # Redirect to the orders page after successful deletion
+    return redirect('orders')
+    
 from django import template
 
 register = template.Library()
-
-
-
-
-
-
 
 def process_payment(request):
     order_id = request.session.get('order_id')
@@ -734,5 +750,4 @@ def payment_done(request):
 @csrf_exempt
 def payment_canceled(request):
     return render(request, 'payment_cancelled.html')
-
         
