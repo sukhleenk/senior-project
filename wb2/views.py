@@ -99,6 +99,7 @@ def add_category(request):
 
 def fetch_products_by_category(request, category_id):
     # Determine if the user is an admin or not.
+    user_logged_in = 'user_id' in request.session
     is_admin = request.session.get('is_admin', False)
     
     # The SQL query changes depending on the admin status. Admins see all products, while others see only visible products.
@@ -116,6 +117,7 @@ def fetch_products_by_category(request, category_id):
     return render(request, 'products.html', {
         'products': products,
         'category_id': category_id,
+        'user_logged_in': user_logged_in,
         'is_admin': is_admin
     })
 

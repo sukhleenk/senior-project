@@ -130,8 +130,20 @@
     <header class="header-bar">
         <h1 class="shop-now-header">Dazzle Dash</h1>
         <div class="header-links">
-            <a href="{% url 'categories' %}">Home</a>
-            <a href="{% url 'view_cart' %}" class="link-button">View Cart</a>
+            {% if not user_logged_in %}
+                <a href="{% url 'categories' %}" class="link-button">Home</a>
+                <a href="{% url 'login' %}" class="link-button">Login</a>
+                <a href="{% url 'signup' %}" class="link-button">Signup</a>
+            {% elif not is_admin %}
+                <a href="{% url 'categories' %}" class="link-button">Home</a>
+                <a href="{% url 'account' %}" class="link-button">Account</a>
+                <a href="{% url 'view_cart' %}" class="link-button">View Cart</a>
+                <a href="{% url 'logout' %}" class="link-button">Logout</a>
+            {% else %}
+                <a href="{% url 'categories' %}" class="link-button">Home</a>
+                <a href="{% url 'orders' %}" class="link-button">Orders</a>
+                <a href="{% url 'logout' %}" class="link-beutton">Logout</a>
+            {% endif %}
         </div>
     </header>
 
