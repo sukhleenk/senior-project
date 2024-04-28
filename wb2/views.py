@@ -446,6 +446,98 @@ def toggle_visibility(request, product_id):
     return HttpResponseRedirect('/')
 
 
+def account(request):
+    if 'user_id' not in request.session:
+        return HttpResponseRedirect(reverse('login'))
+    
+    user_id = request.session['user_id']
+
+    # retrieve the users details from the users table
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT * FROM users WHERE UserID = %s", [user_id])
+        user_info = cursor.fetchone()
+
+
+
+
+    # retrieve the users orders from the orders table
+    
+    current_orders_full = []
+    past_orders_full = []
+
+    # Retrieve current open orders
+    current_orders_full = []
+
+    # Retrieve current open orders
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT * FROM orders WHERE Users_UserID = %s AND fulfilled = 0", [user_id])
+        current_orders = cursor.fetchall()
+
+        for order in current_orders:
+            cursor.execute("SELECT * FROM order_items WHERE Orders_OrderID = %s", [order[0]])
+            order_items = cursor.fetchall()
+
+            current_order_items = []
+            for item in order_items:
+                # Fetch product details from the products table based on product_id
+                cursor.execute("SELECT * FROM products WHERE ProductID = %s", [item[2]])
+                product_info = cursor.fetchone()
+                product_dict = {
+                    'product_id': product_info[0],  # Assuming ProductID is the first column in the products table
+                    'description': product_info[1],  # Assuming Description is the second column
+                    'price': product_info[2],  # Assuming Price is the third column
+                    'quantity': item[3]
+                }
+                current_order_items.append(product_dict)
+
+            current_order_dict = {
+                'order_id': order[0],
+                'date': order[1],  # Assuming the date is in the second column of the orders table
+                'total': order[2],
+                'items': current_order_items
+            }
+            current_orders_full.append(current_order_dict)
+
+
+    # Retrieve past orders
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT * FROM orders WHERE Users_UserID = %s AND fulfilled = 1", [user_id])
+        past_orders = cursor.fetchall()
+
+        for order in past_orders:
+            cursor.execute("SELECT * FROM order_items WHERE Orders_OrderID = %s", [order[0]])
+            order_items = cursor.fetchall()
+
+            past_order_items = []
+            for item in order_items:
+                # Fetch product details from the products table based on product_id
+                cursor.execute("SELECT * FROM products WHERE ProductID = %s", [item[2]])
+                product_info = cursor.fetchone()
+                product_dict = {
+                    'product_id': product_info[0],  # Assuming ProductID is the first column in the products table
+                    'description': product_info[1],  # Assuming Description is the second column
+                    'price': product_info[2],  # Assuming Price is the third column
+                    'quantity': item[3]
+                }
+                past_order_items.append(product_dict)
+
+            past_order_dict = {
+                'order_id': order[0],
+                'date': order[1],  # Assuming the date is in the second column of the orders table
+                'total': order[2],
+                'items': past_order_items
+            }
+            past_orders_full.append(past_order_dict)
+
+    return render(request, 'account.html', {
+        'current_orders': current_orders_full,
+        'past_orders': past_orders_full,
+        'username': user_info[1],
+        'email': user_info[2],
+        'address': user_info[4],
+        'phonenumber': user_info[5],
+    })
+
 
 from django import template
 

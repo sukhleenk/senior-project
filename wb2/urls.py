@@ -1,5 +1,5 @@
 from django.urls import path, include
-from .views import update_product, update_cart, fetch_categories, fetch_products_by_category, signup, login, add_to_cart,login_or_signup_page,logout_view, view_cart, delete_from_cart, add_category, add_product, checkout, process_payment, payment_done, payment_canceled,toggle_visibility
+from .views import update_product, update_cart, fetch_categories, fetch_products_by_category, signup, login, add_to_cart,login_or_signup_page,logout_view, view_cart, delete_from_cart, add_category, add_product, checkout, process_payment, payment_done, payment_canceled,toggle_visibility, account
 urlpatterns = [
     
     path('', fetch_categories, name='categories'),
@@ -21,6 +21,5 @@ urlpatterns = [
     path('payment-done/', payment_done, name='payment_done'),
     path('payment-cancelled/', payment_canceled, name='payment_cancelled'),
     path('toggle_visibility/<int:product_id>/', toggle_visibility, name='toggle_visibility'),
-
-
+    path('account/', account, name='account'),
 ]
