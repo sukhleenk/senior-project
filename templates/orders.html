@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>SHOP NOW</title>
+        {% load static %} 
+        <style>
+            body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+        }
+        .header-bar {
+            background-color: #7e3535;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header-links {
+            display: flex;
+            align-items: center;
+        }
+        .header-links a {
+            background-color: white;
+            color: #7e3535;
+            padding: 10px 15px;
+            border-radius: 5px;
+            text-decoration: none;
+            margin-right: 10px;
+        }
+        .header-links a:hover {
+            background-color: #f7f7f7;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        li {
+            padding: 8px;
+            margin: 10px;
+            background: #f7f7f7;
+            border: 1px solid #ddd;
+            border-radius: 15px;
+            text-align: center;
+        }
+        a {
+            text-decoration: none;
+            color: black;
+            display: block;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        form {
+            text-align: center;
+            margin-top: 20px;
+        }
+        input[type="text"], textarea {
+            padding: 10px;
+            margin-right: 5px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #7e3535;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #5d2727;
+        }
+        </style>
+        <script src="{% static 'js/app.js' %}" defer></script>
+    </head>
+<body>
+    
+    <header class="header-bar">
+        <h1 class="shop-now-header">Dazzle Dash</h1>
+        <div class="header-links">
+            <a href="{% url 'categories' %}">Home</a>
+            <a href="{% url 'view_cart' %}">View Cart</a>
+            <a href="{% url 'account' %}" class="link-button">Account</a>
+        </div>
+    </header>
+
+    <hr>
+
+    <h2>Current Orders</h2>
+    {% for item in current_orders %}
+        <p>Order Number: {{ item.order_id }}</p>
+        <p>Username: {{ item.user.username }}</p>
+        <p>Email: {{ item.user.email }}</p>
+        <p>Order Total: {{ item.total }}</p>
+        <p>Order Date: {{ item.date }}</p>
+        <table>
+            <tr>
+                <th>Product</th>
+                <th>Price</th>
+                <th>Quantity</th>
+            </tr>
+            {% for things in item.items %}
+            <tr>
+                <td>{{ things.description }}</td>
+                <td>{{ things.price }}</td>
+                <td>{{ things.quantity }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    {% endfor %}
+
+
+    <hr>
+
+    <h3>Past Orders</h3>
+
+    {% for item in past_orders %}
+        <p>Order Number: {{ item.order_id }}</p>
+        <p>Username: {{ item.user.username }}</p>
+        <p>Email: {{ item.user.email }}</p>
+        <p>Order Total: {{ item.total }}</p>
+        <p>Order Date: {{ item.date }}</p>
+        <table>
+            <tr>
+                <th>Product</th>
+                <th>Price</th>
+                <th>Quantity</th>
+            </tr>
+            {% for things in item.items %}
+            <tr>
+                <td>{{ things.description }}</td>
+                <td>{{ things.price }}</td>
+                <td>{{ things.quantity }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    {% endfor %}
+
+  
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+
+    
+
+</body>
+</html>

@@ -538,6 +538,100 @@ def account(request):
         'phonenumber': user_info[5],
     })
 
+from django.contrib.auth.models import User
+
+
+def orders(request):
+    current_orders_full = []
+    past_orders_full = []
+
+    # Retrieve current open orders
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT orders.orderID, orders.Users_UserID, orders.date, users.Username, users.Email
+            FROM orders
+            INNER JOIN users ON orders.Users_UserID = users.UserID
+            WHERE orders.fulfilled = 0
+        """)
+        current_orders = cursor.fetchall()
+
+        for order in current_orders:
+            cursor.execute("""
+                SELECT order_items.Products_ProductID, order_items.quantity, products.description, products.price
+                FROM order_items
+                INNER JOIN products ON order_items.Products_ProductID = products.ProductID
+                WHERE order_items.Orders_OrderID = %s
+            """, [order[0]])
+            order_items = cursor.fetchall()
+
+            current_order_items = []
+            for item in order_items:
+                product_dict = {
+                    'product_id': item[0],
+                    'quantity': item[1],
+                    'description': item[2],
+                    'price': item[3]
+                }
+                current_order_items.append(product_dict)
+
+            current_order_dict = {
+                'order_id': order[0],
+                'user': {
+                    'user_id': order[1],
+                    'username': order[3],
+                    'email': order[4]
+                },
+                'date': order[2],
+                'items': current_order_items
+            }
+            current_orders_full.append(current_order_dict)
+
+    # Retrieve past orders
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT orders.orderID, orders.Users_UserID, orders.date, users.Username, users.Email
+            FROM orders
+            INNER JOIN users ON orders.Users_UserID = users.UserID
+            WHERE orders.fulfilled = 1
+        """)
+        past_orders = cursor.fetchall()
+
+        for order in past_orders:
+            cursor.execute("""
+                SELECT order_items.Products_ProductID, order_items.quantity, products.description, products.price
+                FROM order_items
+                INNER JOIN products ON order_items.Products_ProductID = products.ProductID
+                WHERE order_items.Orders_OrderID = %s
+            """, [order[0]])
+            order_items = cursor.fetchall()
+
+            past_order_items = []
+            for item in order_items:
+                product_dict = {
+                    'product_id': item[0],
+                    'quantity': item[1],
+                    'description': item[2],
+                    'price': item[3]
+                }
+                past_order_items.append(product_dict)
+
+            past_order_dict = {
+                'order_id': order[0],
+                'user': {
+                    'user_id': order[1],
+                    'username': order[3],
+                    'email': order[4]
+                },
+                'date': order[2],
+                'items': past_order_items
+            }
+            past_orders_full.append(past_order_dict)
+
+    return render(request, 'orders.html', {
+        'current_orders': current_orders_full,
+        'past_orders': past_orders_full
+    })
+
 
 from django import template
 
