@@ -165,17 +165,9 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
-STATIC_URL = 'static/'
-
-# STATIC_ROOT = 'C:/Users/sukh1/Downloads/Senior_project_jewelry'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-
-PROJECT_ROOT = os.path.normpath(os.path.dirname(__file__))
-STATICFILES_DIRS = [
-    os.path.join(PROJECT_ROOT, '..', 'static'),
-]
-STATICFILES_STORAGE='whitenoise.storage.CompressedManifestStaticFilesStorage'
-
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATICFILES_STORAGE="whitenoise.storage.CompressedManifestStaticFilesStorage"
 # settings.py
 
 # LDAP
