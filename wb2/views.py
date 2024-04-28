@@ -538,8 +538,18 @@ def account(request):
         'phonenumber': user_info[5],
     })
 
-from django.contrib.auth.models import User
+@require_POST
+def mark_order_fulfilled(request, order_id):
+    # Mark order as fulfilled in the orders table
+    with connection.cursor() as cursor:
+        try:
+            cursor.execute("UPDATE orders SET fulfilled = 1 WHERE OrderID = %s", [order_id])
+        except Exception as e:
+            # Handle any database errors
+            return HttpResponseBadRequest("Error marking order as fulfilled")
 
+    # Redirect to the orders page after successful fulfillment
+    return redirect('orders')
 
 def orders(request):
     current_orders_full = []
