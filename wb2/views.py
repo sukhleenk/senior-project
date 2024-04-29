@@ -385,7 +385,7 @@ def update_product(request, product_id):
         # Execute SQL if there's at least one field to update
         if updates:
             params.append(product_id)
-            sql = "UPDATE products SET " + ", ".join(updates) + " WHERE product_id = %s"
+            sql = "UPDATE products SET " + ", ".join(updates) + " WHERE ProductID = %s"
             with connection.cursor() as cursor:
                 cursor.execute(sql, params)
 
