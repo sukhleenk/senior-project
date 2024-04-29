@@ -81,24 +81,28 @@
     </header>
 
     <h2>User Information</h2>
-    <table>
+    <table id="infoTable">
         <tr>
             <th>Username</th>
-            <td>{{ username }}</td>
+            <td><span id="username">{{ username }}</span><input type="text" id="usernameInput" value="{{ username }}" style="display:none;"></td>
         </tr>
         <tr>
             <th>Email</th>
-            <td>{{ email }}</td>
+            <td><span id="email">{{ email }}</span><input type="text" id="emailInput" value="{{ email }}" style="display:none;"></td>
         </tr>
         <tr>
             <th>Address</th>
-            <td>{{ address }}</td>
+            <td><span id="address">{{ address }}</span><input type="text" id="addressInput" value="{{ address }}" style="display:none;"></td>
         </tr>
         <tr>
             <th>Phone Number</th>
-            <td>{{ phonenumber }}</td>
+            <td><span id="phonenumber">{{ phonenumber }}</span><input type="text" id="phoneNumberInput" value="{{ phonenumber }}" style="display:none;"></td>
         </tr>
     </table>
+    <button onclick="editInfo()">Edit</button>
+    <button onclick="updateInfo()" style="display:none;">Update</button>
+    <button onclick="cancelEdit()" style="display:none;">Cancel</button>
+
     <hr>
     <h2>Current Orders</h2>
     {% for item in current_orders %}
@@ -168,7 +172,82 @@
     {% endfor %}
     
 
+    <script>
+        function editInfo() {
+            // Show inputs
+            document.getElementById('usernameInput').style.display = 'inline';
+            document.getElementById('emailInput').style.display = 'inline';
+            document.getElementById('addressInput').style.display = 'inline';
+            document.getElementById('phoneNumberInput').style.display = 'inline';
+        
+            // Hide spans
+            document.getElementById('username').style.display = 'none';
+            document.getElementById('email').style.display = 'none';
+            document.getElementById('address').style.display = 'none';
+            document.getElementById('phonenumber').style.display = 'none';
+        
+            // Show/hide buttons
+            document.querySelector('button[onclick="editInfo()"]').style.display = 'none';
+            document.querySelector('button[onclick="updateInfo()"]').style.display = 'inline';
+            document.querySelector('button[onclick="cancelEdit()"]').style.display = 'inline';
+        }
+        
+        function cancelEdit() {
+            // Hide inputs
+            document.getElementById('usernameInput').style.display = 'none';
+            document.getElementById('emailInput').style.display = 'none';
+            document.getElementById('addressInput').style.display = 'none';
+            document.getElementById('phoneNumberInput').style.display = 'none';
+        
+            // Show spans
+            document.getElementById('username').style.display = 'inline';
+            document.getElementById('email').style.display = 'inline';
+            document.getElementById('address').style.display = 'inline';
+            document.getElementById('phonenumber').style.display = 'inline';
+        
+            // Show/hide buttons
+            document.querySelector('button[onclick="editInfo()"]').style.display = 'inline';
+            document.querySelector('button[onclick="updateInfo()"]').style.display = 'none';
+            document.querySelector('button[onclick="cancelEdit()"]').style.display = 'none';
+        }
+        
+        function updateInfo() {
+            // Ideally, here you would collect the data from inputs and send it to the server
+            console.log('Update functionality to be implemented.');
 
+            const data = {
+                username: document.getElementById('usernameInput').value,
+                email: document.getElementById('emailInput').value,
+                address: document.getElementById('addressInput').value,
+                phone_number: document.getElementById('phoneNumberInput').value,
+                csrfmiddlewaretoken: '{{ csrf_token }}' // Capture the CSRF token rendered by Django
+            };
+
+            // console log every item
+            console.log(data);
+
+            fetch("{% url 'account' %}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': data.csrfmiddlewaretoken
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Success:', data);
+                alert('Information updated successfully!');
+                window.location.reload();
+                // cancelEdit(); // Optionally, revert to non-edit mode
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                alert('Error updating information.');
+            });
+        }
+    </script>
+        
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 </body>
 </html>

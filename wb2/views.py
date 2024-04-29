@@ -447,7 +447,7 @@ def toggle_visibility(request, product_id):
         return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
     return HttpResponseRedirect('/')
 
-
+import json
 def account(request):
     if 'user_id' not in request.session:
         return HttpResponseRedirect(reverse('login'))
@@ -460,6 +460,22 @@ def account(request):
         user_info = cursor.fetchone()
 
 
+    # data = json.loads(request.body)
+    # user = request.user
+    # user.username = data.get('username')
+    # user.email = data.get('email')
+    # user.address = data.get('address')
+    # user.phonenumber = data.get('phonenumber')
+    # user.save()
+    
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        with connection.cursor() as cursor:
+            cursor.execute("""
+                UPDATE users SET Username = %s, Email = %s, Address = %s, PhoneNumber = %s 
+                WHERE UserID = %s
+                """, [data['username'], data['email'], data['address'], data['phone_number'], user_id])
+        return JsonResponse({'message': 'User updated successfully'}, status=200)
 
 
     # retrieve the users orders from the orders table
