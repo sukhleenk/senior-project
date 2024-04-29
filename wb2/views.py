@@ -473,7 +473,17 @@ def checkout(request):
 
     # Check for POST request to update address
     if request.method == 'POST':
-        new_address = request.POST.get('address', '').strip()
+        # new_address = request.POST.get('address', '').strip()
+
+        # Retrieve each component of the address from the form
+        street_name = request.POST.get('street_name', '').strip()
+        city_town = request.POST.get('city_town', '').strip()
+        state = request.POST.get('state', '').strip()
+        zipcode = request.POST.get('zipcode', '').strip()
+
+        # Concatenate these components into a single address string
+        new_address = f"{street_name}, {city_town}, {state}, {zipcode}"
+
         with connection.cursor() as cursor:
             cursor.execute("UPDATE users SET address = %s WHERE UserID = %s", [new_address, user_id])
 
