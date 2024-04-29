@@ -15,7 +15,7 @@ from django.contrib.auth import authenticate,login as auth_login, login, logout
 from django.contrib import messages
 from .settings import PAYPAL_RECEIVER_EMAIL
 import json
-
+import random
 
 
 def signup(request):
@@ -144,13 +144,15 @@ def add_to_cart(request, product_id):
     with connection.cursor() as cursor:
         # First, check if there is an existing order for the user
         cursor.execute("SELECT order_id FROM cart WHERE Users_UserID = %s LIMIT 1", [user_id])
+        # cursor.execute("SELECT MAX(orderID) FROM orders WHERE Users_UserID = %s", [user_id])
         order_id_result = cursor.fetchone()
         
         if order_id_result:
             order_id = order_id_result[0]
         else:
             # If there is no existing order, create a new order_id
-            cursor.execute("SELECT MAX(order_id) FROM cart")
+            #! CHANGED THIS so that the order id is always referring to the order table -- for invoice purposes for paypal
+            cursor.execute("SELECT MAX(orderID) FROM orders")
             max_order_id_result = cursor.fetchone()
             max_order_id = max_order_id_result[0] if max_order_id_result[0] else 0
             order_id = max_order_id + 1
@@ -449,13 +451,13 @@ def checkout(request):
 
         messages.success(request, "Address updated successfully!")
         return redirect('checkout')  # Refresh the page to show updated address
-
+    random_digits = random.randint(100000, 999999)
     # PayPal setup remains the same
     paypal_dict = {
         'business': PAYPAL_RECEIVER_EMAIL,
         'amount': '%.2f' % total_price,
-        'item_name': 'Order {}'.format(cart_items_dicts[0]['order_id'] if cart_items_dicts else 'N/A'),
-        'invoice': str(cart_items_dicts[0]['order_id']),
+        'item_name': 'Order {}'.format(str(cart_items_dicts[0]['order_id']) + str(random_digits) if cart_items_dicts else str(random_digits)),
+        'invoice': str(cart_items_dicts[0]['order_id']) + str(random_digits) if cart_items_dicts else str(random_digits),
         'currency_code': 'USD',
         'notify_url': 'http://{}{}'.format(request.get_host(), reverse('paypal-ipn')),
         'return_url': 'http://{}{}'.format(request.get_host(), reverse('payment_done')),
