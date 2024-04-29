@@ -51,7 +51,7 @@
         }
         li {
             width: 200px;
-            height: 300px;
+            height: 100%;
             padding: 10px;
             background: #ffffff;
             border: 1px solid #ddd;
@@ -104,6 +104,23 @@
             height: 100%;
             object-fit: cover; /* Ensures the image covers the container without distortion */
         }
+        .form-inputs {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%; /* Adjust width as needed */
+            box-sizing: border-box;
+            padding: 20px;
+        }
+        .form-inputs label {
+            margin-top: 5px;
+            margin-bottom: 2px;
+            font-weight: bold;
+            font-size: small;
+        }
+        .editable-field {
+            margin: 2px 0 2px 0;
+        }
     </style>
 </head>
 
@@ -145,11 +162,18 @@
                     <button type="submit">{{ product.is_visible|yesno:"Show,Hide" }}</button>
                 </form>
 
-                <form action="{% url 'update_product' product.0 %}" method="post">
+                <form action="{% url 'update_product' product.0 %}" method="post" class="form-inputs">
                     {% csrf_token %}
-                    <input type="text" name="description" value="{{ product.1 }}" class="editable-field">
-                    <input type="text" name="price" value="{{ product.2 }}" class="editable-field" pattern="^\d+(\.\d{1,2})?$">
-                    <button type="submit">Update</button>
+                    <label for="description">Description:</label>
+                    <input type="text" id="description" name="description" value="{{ product.1 }}" class="editable-field">
+                    
+                    <label for="price">Price:</label>
+                    <input type="text" id="price" name="price" value="{{ product.2 }}" class="editable-field" pattern="^\d+(\.\d{1,2})?$">
+                    
+                    <label for="invetory">Inventory:</label>
+                    <input type="number" id="invetory" name="invetory" value="{{ product.3 }}" class="editable-field" min="0">
+
+                    <button type="submit" class="update-button" style="margin: 5px;">Update</button>
                 </form>
                 {% else %}
                 <form action="{% url 'add_to_cart' product.0 %}" method="post">

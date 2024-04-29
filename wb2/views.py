@@ -322,6 +322,20 @@ def add_product(request):
     if 'user_id' not in request.session or not request.session.get('is_admin', False):
         # Redirect non-admin users to the login page
         return redirect('login')
+    
+    # store is_admin in a variable 
+    is_admin = request.session.get('is_admin', False)
+    user_logged_in = 'user_id' in request.session
+
+    # The SQL query changes depending on the admin status. Admins see all products, while others see only visible products.
+    
+
+    # return render(request, 'products.html', {
+    #     'products': products,
+    #     'category_id': category_id,
+    #     'user_logged_in': user_logged_in,
+    #     'is_admin': is_admin
+    # })
 
     if request.method == 'POST':
         description = request.POST.get('description')
@@ -341,13 +355,31 @@ def add_product(request):
                 VALUES (%s, %s, %s, %s, %s)
             """, [description, price, invetory, category_id, '1'])
 
+        
+        if is_admin:
+            query = "SELECT * FROM products WHERE Categories_category = %s"
+            params = [category_id]
+        else:
+            query = "SELECT * FROM products WHERE Categories_category = %s AND is_visible = 1"
+            params = [category_id]
+
+        with connection.cursor() as cursor:
+            cursor.execute(query, params)
+            products = cursor.fetchall()
+
         # Redirect back to the products page for the given category
         #return redirect('fetch_products_by_category', category_id=category_id)
+        # return render(request, 'products.html', {
+        #     'products': products,
+        #     'category_id': category_id,
+        #     'is_admin': is_admin
+        # })
         return render(request, 'products.html', {
-        'products': products,
-        'category_id': category_id,
-        'is_admin': is_admin
-    })
+            'products': products,
+            'category_id': category_id,
+            'user_logged_in': user_logged_in,
+            'is_admin': is_admin
+        })
 
     # Retrieve the list of categories only if we need to display the form
     if request.method == 'GET':
@@ -366,7 +398,7 @@ def update_product(request, product_id):
         # Retrieve data from POST request
         description = request.POST.get('description')
         price = request.POST.get('price')
-        inventory = request.POST.get('inventory')
+        invetory = request.POST.get('invetory')
         
         updates = []
         params = []
@@ -378,9 +410,9 @@ def update_product(request, product_id):
         if price:
             updates.append("price = %s")
             params.append(price)
-        if inventory:
-            updates.append("inventory = %s")
-            params.append(inventory)
+        if invetory:
+            updates.append("invetory = %s")
+            params.append(invetory)
 
         # Execute SQL if there's at least one field to update
         if updates:
