@@ -455,7 +455,7 @@ def checkout(request):
         'business': PAYPAL_RECEIVER_EMAIL,
         'amount': '%.2f' % total_price,
         'item_name': 'Order {}'.format(cart_items_dicts[0]['order_id'] if cart_items_dicts else 'N/A'),
-        'invoice': str(cart_items_dicts[0]['order_id'] if cart_items_dicts else 'N/A'),
+        'invoice': str(cart_items_dicts[0]['order_id']),
         'currency_code': 'USD',
         'notify_url': 'http://{}{}'.format(request.get_host(), reverse('paypal-ipn')),
         'return_url': 'http://{}{}'.format(request.get_host(), reverse('payment_done')),
