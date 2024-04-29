@@ -94,6 +94,16 @@
             <button type="submit">Login</button>
         </form>
     </main>
+
+    {% if error %}
+        <!-- Using JavaScript alert to display the error -->
+        <script>
+            window.onload = function() {
+                alert('{{ error }}');
+            };
+        </script>
+    {% endif %}
+    
     <script>
         function togglePasswordVisibility() {
             var passwordInput = document.getElementById('password');

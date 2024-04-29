@@ -45,6 +45,8 @@ from django.shortcuts import redirect
 
 
 def login(request):
+    error_message = None
+
     if request.method == 'POST':   
         username = request.POST.get('username')
         password = request.POST.get('password')
@@ -58,8 +60,9 @@ def login(request):
                 request.session['is_admin'] = bool(user_record[2]) 
                 return redirect('categories')
             else:
-                return HttpResponse("Invalid login", status=401)
-    return render(request, 'login.html')
+                # return HttpResponse("Invalid login", status=401)
+                error_message = "Invalid login credentials. Please try again."
+    return render(request, 'login.html', {'error': error_message})
 
 
 def fetch_categories(request):
@@ -236,6 +239,43 @@ def update_cart(request):
         return JsonResponse({'status': 'error', 'message': 'Invalid quantity'})
 
 from django.db import transaction
+
+
+@csrf_exempt  # Temporarily disable CSRF token requirement for demonstration
+@require_POST
+def update_password(request):
+    try:
+        # Load JSON data from request body
+        data = json.loads(request.body)
+        user_id = request.session.get('user_id')  # Assuming user's ID is stored in session after login
+
+        if not user_id:
+            return JsonResponse({'error': 'User is not logged in'}, status=403)
+
+        # Connect to the database to verify current password
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT Password FROM users WHERE UserID = %s", [user_id])
+            record = cursor.fetchone()
+
+        if not record:
+            return JsonResponse({'error': 'User not found'}, status=404)
+
+        # Check current password
+        if not check_password(data['currentPassword'], record[0]):
+            return JsonResponse({'error': 'Incorrect current password'}, status=400)
+
+        # Hash new password
+        hashed_password = make_password(data['newPassword'])
+
+        # Update database with new password
+        with connection.cursor() as cursor:
+            cursor.execute("UPDATE users SET Password = %s WHERE UserID = %s", [hashed_password, user_id])
+
+        return JsonResponse({'message': 'Password updated successfully'}, status=200)
+    
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
 
 
 def delete_from_cart(request, cart_id):

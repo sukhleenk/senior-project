@@ -99,9 +99,80 @@
             <td><span id="phonenumber">{{ phonenumber }}</span><input type="text" id="phoneNumberInput" value="{{ phonenumber }}" style="display:none;"></td>
         </tr>
     </table>
-    <button onclick="editInfo()">Edit</button>
+    <button onclick="editInfo()">Edit User Information</button>
     <button onclick="updateInfo()" style="display:none;">Update</button>
     <button onclick="cancelEdit()" style="display:none;">Cancel</button>
+
+    <button id="editPasswordBtn">Update Password</button>
+
+    <!-- Password Update Form -->
+    <div id="passwordForm" style="display: none;">
+        <input type="password" id="currentPassword" placeholder="Current Password">
+        <input type="password" id="newPassword" placeholder="New Password">
+        <input type="password" id="confirmPassword" placeholder="Confirm New Password">
+        <button onclick="updatePassword()">Update Password</button>
+        <button onclick="togglePasswordForm(false)">Cancel</button>
+    </div>
+
+    <script>
+        document.getElementById('editPasswordBtn').addEventListener('click', function() {
+            togglePasswordForm(true);
+        });
+
+        function togglePasswordForm(show) {
+            const form = document.getElementById('passwordForm');
+            const button = document.getElementById('editPasswordBtn');
+
+            if (show) {
+                form.style.display = 'block';
+                button.style.display = 'none';  // Hide the toggle button when form is shown
+            } else {
+                form.style.display = 'none';
+                button.style.display = 'inline'; // Show the toggle button when form is hidden
+            }
+        }
+
+        function updatePassword() {
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            // Basic validation for new password and confirmation
+            if (newPassword !== confirmPassword) {
+                alert("New passwords do not match.");
+                return;
+            }
+
+            fetch("/path/to/password/update/", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({
+                    currentPassword: currentPassword,
+                    newPassword: newPassword
+                })
+            })
+            .then(response => {
+                if (response.ok) {
+                    alert('Password updated successfully!');
+                    togglePasswordForm(false);
+                } else {
+                    response.json().then(data => {
+                        console.error('Error:', data.error);
+                        alert('Failed to update password: ' + data.error);
+                    });
+                }
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                alert('Error updating password.');
+            });
+        }
+    </script>
+
+    
 
     <hr>
     <h2>Current Orders</h2>
@@ -251,5 +322,3 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 </body>
 </html>
-
-
