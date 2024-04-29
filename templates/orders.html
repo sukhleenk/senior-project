@@ -5,156 +5,162 @@
         {% load static %} 
         <style>
             body {
-            margin: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-        }
-        .header-bar {
-            background-color: #7e3535;
-            color: white;
-            padding: 10px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .header-links {
-            display: flex;
-            align-items: center;
-        }
-        .header-links a {
-            background-color: white;
-            color: #7e3535;
-            padding: 10px 15px;
-            border-radius: 5px;
-            text-decoration: none;
-            margin-right: 10px;
-        }
-        .header-links a:hover {
-            background-color: #f7f7f7;
-        }
-        ul {
-            list-style-type: none;
-            padding: 0;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-        li {
-            padding: 8px;
-            margin: 10px;
-            background: #f7f7f7;
-            border: 1px solid #ddd;
-            border-radius: 15px;
-            text-align: center;
-        }
-        a {
-            text-decoration: none;
-            color: black;
-            display: block;
-        }
-        a:hover {
-            text-decoration: underline;
-        }
-        form {
-            text-align: center;
-            margin-top: 20px;
-        }
-        input[type="text"], textarea {
-            padding: 10px;
-            margin-right: 5px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-        }
-        button {
-            padding: 10px 20px;
-            background-color: #7e3535;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #5d2727;
-        }
+                margin: 0;
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+                background-color: #f4f4f4;
+            }
+            .header-bar {
+                background-color: #7e3535;
+                color: white;
+                padding: 10px 20px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+            .header-links {
+                display: flex;
+                align-items: center;
+            }
+            .header-links a, .header-links .link-button {
+                background-color: white;
+                color: #7e3535;
+                padding: 10px 15px;
+                border-radius: 5px;
+                text-decoration: none;
+                margin-right: 10px;
+            }
+            .header-links a:hover, .header-links .link-button:hover {
+                background-color: #f7f7f7;
+            }
+            h2, h3 {
+                text-align: center;
+                padding-top: 20px;
+            }
+            table {
+                width: 80%;
+                margin: 20px auto;
+                border-collapse: collapse;
+                background: white;
+            }
+            th, td {
+                padding: 12px;
+                border: 1px solid #ddd;
+                text-align: left;
+            }
+            th {
+                background-color: #7e3535;
+                color: white;
+            }
+            .order-info {
+                margin: 2% 15%;
+                background-color: #ffffff;
+                padding: 10px;
+                border-radius: 10px;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            }
+            button {
+                padding: 10px 20px;
+                background-color: #7e3535;
+                color: white;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+                margin-top: 10px;
+            }
+            button:hover {
+                background-color: #5d2727;
+            }
+            .mark-fulfilled-button {
+                background-color: #216d33; /* Green */
+                color: white;
+            }
+            .mark-fulfilled-button:hover {
+                background-color: #216d33; /* Darker green */
+            }
+            hr {
+                margin-top: 20px;
+            }
         </style>
+        
         <script src="{% static 'js/app.js' %}" defer></script>
     </head>
 
-<body>
-    <header class="header-bar">
-        <h1 class="shop-now-header">Dazzle Dash</h1>
-        <div class="header-links">
-            <a href="{% url 'categories' %}">Home</a>
-            <!-- <a href="{% url 'account' %}" class="link-button">Account</a> -->
-            <a href="{% url 'logout' %}" class="link-button">Logout</a>
-        </div>
-    </header>
+    <body>
+        <header class="header-bar">
+            <h1 class="shop-now-header">Dazzle Dash</h1>
+            <div class="header-links">
+                <a href="{% url 'categories' %}">Home</a>
+                <a href="{% url 'logout' %}" class="link-button">Logout</a>
+            </div>
+        </header>
 
-    <hr>
+        <hr>
 
-    <h2>Current Orders</h2>
-    {% for item in current_orders %}
-        <p>Order Number: {{ item.order_id }}</p>
-        <p>Username: {{ item.user.username }}</p>
-        <p>Email: {{ item.user.email }}</p>
-        <p>Order Total: {{ item.total }}</p>
-        <p>Order Date: {{ item.date }}</p>
-        <table>
-            <tr>
-                <th>Product</th>
-                <th>Price</th>
-                <th>Quantity</th>
-            </tr>
-            {% for things in item.items %}
-            <tr>
-                <td>{{ things.description }}</td>
-                <td>{{ things.price }}</td>
-                <td>{{ things.quantity }}</td>
-            </tr>
-            {% endfor %}
-        </table>
+        <h2>Current Orders</h2>
+        {% for item in current_orders %}
+            <div class="order-info">
+                <p>Order Number: {{ item.order_id }}</p>
+                <p>Username: {{ item.user.username }}</p>
+                <p>Email: {{ item.user.email }}</p>
+                <p>Order Total: {{ item.total }}</p>
+                <p>Order Date: {{ item.date }}</p>
+                <table>
+                    <tr>
+                        <th>Product</th>
+                        <th>Price</th>
+                        <th>Quantity</th>
+                    </tr>
+                    {% for things in item.items %}
+                    <tr>
+                        <td>{{ things.description }}</td>
+                        <td>{{ things.price }}</td>
+                        <td>{{ things.quantity }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
 
-        <!-- Form for delete button -->
-        <form action="{% url 'delete_order' item.order_id %}" method="post">
-            {% csrf_token %}
-            <button type="submit">Delete</button>
-        </form>
+                <!-- Form for delete button -->
+                <form action="{% url 'delete_order' item.order_id %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit">Delete</button>
+                </form>
 
-        <form action="{% url 'mark_order_fulfilled' item.order_id %}" method="post">
-            {% csrf_token %}
-            <button type="submit">Mark as Fulfilled</button>
-        </form>
-    {% endfor %}
-    <hr>
+                <form action="{% url 'mark_order_fulfilled' item.order_id %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="mark-fulfilled-button">Mark as Fulfilled</button>
+                </form>
+                
+                
+            </div>
+        {% endfor %}
+        <hr>
 
-    <h3>Past Orders</h3>
+        <h3>Past Orders</h3>
 
-    {% for item in past_orders %}
-        <p>Order Number: {{ item.order_id }}</p>
-        <p>Username: {{ item.user.username }}</p>
-        <p>Email: {{ item.user.email }}</p>
-        <p>Order Total: {{ item.total }}</p>
-        <p>Order Date: {{ item.date }}</p>
-        <table>
-            <tr>
-                <th>Product</th>
-                <th>Price</th>
-                <th>Quantity</th>
-            </tr>
-            {% for things in item.items %}
-            <tr>
-                <td>{{ things.description }}</td>
-                <td>{{ things.price }}</td>
-                <td>{{ things.quantity }}</td>
-            </tr>
-            {% endfor %}
-        </table>
-    {% endfor %}
+        {% for item in past_orders %}
+            <div class="order-info">
+                <p>Order Number: {{ item.order_id }}</p>
+                <p>Username: {{ item.user.username }}</p>
+                <p>Email: {{ item.user.email }}</p>
+                <p>Order Total: {{ item.total }}</p>
+                <p>Order Date: {{ item.date }}</p>
+                <table>
+                    <tr>
+                        <th>Product</th>
+                        <th>Price</th>
+                        <th>Quantity</th>
+                    </tr>
+                    {% for things in item.items %}
+                    <tr>
+                        <td>{{ things.description }}</td>
+                        <td>{{ things.price }}</td>
+                        <td>{{ things.quantity }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        {% endfor %}
 
-  
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-
-
-    
-
-</body>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    </body>
 </html>

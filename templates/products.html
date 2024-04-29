@@ -10,6 +10,7 @@
             margin: 0;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #f4f4f4;
+            padding-bottom: 50px;
         }
         .header-bar {
             background-color: #7e3535;
@@ -22,6 +23,8 @@
         .header-links {
             display: flex;
             align-items: center;
+            justify-content: flex-end; 
+            flex-grow: 1;
         }
         .header-links a {
             background-color: white;
@@ -29,12 +32,14 @@
             padding: 10px 15px;
             border-radius: 5px;
             text-decoration: none;
+            margin-left: 10px; 
         }
         .header-links a:hover {
             background-color: #f7f7f7;
         }
         h1, h2 {
             text-align: center;
+            margin: 20px 0;
         }
         ul {
             list-style-type: none;
@@ -42,87 +47,48 @@
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
+            gap: 20px;
         }
         li {
             width: 200px;
             height: 300px;
-            padding: 8px;
-            margin: 10px;
-            background: #f7f7f7;
+            padding: 10px;
+            background: #ffffff;
             border: 1px solid #ddd;
             border-radius: 15px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
         li img {
-            width: auto;
-            max-height: 60%;
+            width: 200%; 
+            height: 100%; 
             border-radius: 15px;
+            object-fit: cover; 
         }
         .product-description {
-            overflow: hidden;
-            white-space: nowrap;
-            text-overflow: ellipsis;
+            text-align: center;
+            margin: 10px;
         }
-        button {
+        button, .link-button {
             padding: 10px 20px;
             background-color: #7e3535;
             color: white;
             border: none;
             border-radius: 5px;
             cursor: pointer;
+            transition: background-color 0.3s;
         }
-        button:hover {
+        button:hover, .link-button:hover {
             background-color: #5d2727;
         }
-        a {
+        .link-button {
+            display: inline-block;
             text-decoration: none;
-            color: black;
+            margin-top: 20px;
         }
-        a:hover {
-            text-decoration: underline;
-        }
-        /* Add these styles within your <style> tag */
-.link-button {
-    display: inline-block;
-    padding: 10px 20px;
-    background-color: #7e3535;
-    color: white;
-    border-radius: 5px;
-    text-decoration: none;
-    border: none;
-    cursor: pointer;
-    align-items: center;
-}
-
-.link-button:hover {
-    background-color: #5d2727;
-}
-
-.header-links a,
-        .header-links .link-button {
-            margin-right: 10px; /* Adds space between the links */
-            display: inline-block; /* Ensures that the links are aligned properly */
-            text-align: center; /* Center text inside the links */
-        }
-
-        /* Ensuring the header links don't wrap or overlap */
-        .header-links {
-            display: flex;
-            flex-wrap: nowrap; /* Prevents wrapping of header items */
-        }
-
-        /* You may also want to add a media query if the buttons still overlap on smaller screens */
-        @media (max-width: 600px) {
-            .header-links a,
-            .header-links .link-button {
-                padding: 5px 10px; /* Reduces padding on smaller screens */
-                font-size: 0.9em; /* Reduces font size on smaller screens */
-            }
-        }
-        
     </style>
 </head>
 
@@ -142,7 +108,7 @@
             {% else %}
                 <a href="{% url 'categories' %}" class="link-button">Home</a>
                 <a href="{% url 'orders' %}" class="link-button">Orders</a>
-                <a href="{% url 'logout' %}" class="link-beutton">Logout</a>
+                <a href="{% url 'logout' %}" class="link-button">Logout</a>
             {% endif %}
         </div>
     </header>
@@ -151,14 +117,14 @@
     <ul>
         {% for product in products %}
             <li>
-                <img src="{% static product.1|add:'.jpg' %}" alt="Product Image" style="width:100px; height:100px;">
-                <div>{{ product.1 }} - Price: ${{ product.2 }}</div>
+                <img src="{% static product.1|add:'.jpg' %}" alt="Product Image" style="width:100%; height:100%;">
+                <div class="product-description">{{ product.1 }} - Price: ${{ product.2 }}</div>
                 
-                <!-- Visibility Toggle Button for Admins -->
                 {% if is_admin %}
+                
                 <form action="{% url 'toggle_visibility' product.0 %}" method="post" style="display: inline;">
                     {% csrf_token %}
-                    <button type="submit">{{ product.is_visible|yesno:"Hide,Show" }}</button>
+                    <button type="submit">{{ product.is_visible|yesno:"Show,Hide" }}</button>
                 </form>
 
                 <form action="{% url 'update_product' product.0 %}" method="post">
@@ -182,6 +148,29 @@
     {% if user.is_authenticated %}
     <a href="{% url 'view_cart' %}" class="link-button">View Cart</a>
 {% endif %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const toggleForms = document.querySelectorAll('form[action*="toggle_visibility"]');
+        toggleForms.forEach(form => {
+            form.addEventListener('submit', function(event) {
+                event.preventDefault();
+                fetch(form.action, {
+                    method: 'POST',
+                    body: new FormData(form),
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    }
+                }).then(response => {
+                    if(response.ok) {
+                        let button = form.querySelector('button');
+                        button.textContent = button.textContent === 'Show' ? 'Hide' : 'Show';
+                    }
+                }).catch(error => console.error('Error toggling visibility:', error));
+            });
+        });
+    });
+</script>
+
 </body>
 </html>
 
