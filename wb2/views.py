@@ -352,7 +352,7 @@ def add_product(request):
     # Retrieve the list of categories only if we need to display the form
     if request.method == 'GET':
         with connection.cursor() as cursor:
-            cursor.execute("SELECT * FROM categories")
+            cursor.execute("SELECT * FROM Categories")
             categories = cursor.fetchall()
 
         # Return the form for adding a product with the categories
@@ -395,10 +395,6 @@ def update_product(request, product_id):
 
 
 from paypal.standard.forms import PayPalPaymentsForm
-
-
-
-
 def checkout(request):
     if 'user_id' not in request.session:
         return HttpResponseRedirect(reverse('login'))
