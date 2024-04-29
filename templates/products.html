@@ -89,6 +89,21 @@
             text-decoration: none;
             margin-top: 20px;
         }
+        .image-container {
+            width: 100%; /* Take the full width of its parent */
+            position: relative; /* Required for absolute positioning of the img inside */
+            overflow: hidden; /* Ensures no overflow of content outside the container */
+            padding-top: 100%; /* The magic number for a square aspect ratio */
+        }
+
+        .image-container img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Ensures the image covers the container without distortion */
+        }
     </style>
 </head>
 
@@ -117,7 +132,10 @@
     <ul>
         {% for product in products %}
             <li>
-                <img src="{% static product.1|add:'.jpg' %}" alt="Product Image" style="width:100%; height:100%;">
+                <div class="image-container">
+                    <img src="{% static product.1|add:'.jpg' %}" alt="Product Image">
+                </div>
+                <!-- <img src="{% static product.1|add:'.jpg' %}" alt="Product Image" style="width:100%; height:100%;"> -->
                 <div class="product-description">{{ product.1 }} - Price: ${{ product.2 }}</div>
                 
                 {% if is_admin %}
