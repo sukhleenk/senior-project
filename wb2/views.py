@@ -425,6 +425,11 @@ def checkout(request):
         """, [user_id])
         results = cursor.fetchall()
 
+        if not results:
+            # Cart is empty, handle accordingly
+            messages.error(request, "Your cart is empty. Please add items to your cart before checking out.")
+            return redirect('view_cart')  # Redirect them to a page where they can add items
+
         cart_items_dicts = [{
             'cart_id': item[0],
             'quantity': item[1],
