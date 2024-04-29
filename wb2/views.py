@@ -337,9 +337,9 @@ def add_product(request):
 
         with connection.cursor() as cursor:
             cursor.execute("""
-                INSERT INTO products (description, price, invetory, Categories_category)
-                VALUES (%s, %s, %s, %s)
-            """, [description, price, invetory, category_id])
+                INSERT INTO products (description, price, invetory, Categories_category, is visible)
+                VALUES (%s, %s, %s, %s, %s)
+            """, [description, price, invetory, category_id, 1])
 
         # Redirect back to the products page for the given category
         #return redirect('fetch_products_by_category', category_id=category_id)
