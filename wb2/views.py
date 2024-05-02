@@ -783,19 +783,14 @@ def payment_done(request):
 
         total_price = sum(item['quantity'] * item['price'] for item in cart_items_dicts) if cart_items_dicts else 0
 
-    # return render(request, 'process_payment.html', {
-    #     'order_id': cart_items_dicts[0]['order_id'] if cart_items_dicts else None,
-    #     'edit_address': False,
-    #     'form': form,
-    #     'cart_items': cart_items_dicts,
-    #     'total_price': total_price,
-    #     'user_id': user_id,
-    #     'address': address  # Pass the fetched address to the template
-    # })
-
     # Clear the cart after payment is done
     with connection.cursor() as cursor:
         cursor.execute("DELETE FROM cart WHERE Users_UserID = %s", [user_id])
+
+    # decrement the inventory of the products in the order
+    with connection.cursor() as cursor:
+        for item in cart_items_dicts:
+            cursor.execute("UPDATE products SET invetory = invetory - %s WHERE ProductID = %s", [item['quantity'], item['product_id']])
 
     # add the order to the order table
     with connection.cursor() as cursor:
